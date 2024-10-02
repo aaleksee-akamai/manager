@@ -43,6 +43,7 @@ import type {
 } from '@linode/api-v4';
 import type { QueryClient } from '@tanstack/react-query';
 import type { EventHandlerData } from 'src/hooks/useEventHandlers';
+import { getPermissions } from '@linode/api-v4/src/profile';
 
 export const profileQueries = createQueryKeys('profile', {
   appTokens: (params: Params = {}, filter: Filter = {}) => ({
@@ -57,6 +58,10 @@ export const profileQueries = createQueryKeys('profile', {
     queryFn: () => getPersonalAccessTokens(params, filter),
     queryKey: [params, filter],
   }),
+  permissions: {
+    queryFn: getPermissions,
+    queryKey: null,
+  },
   preferences: {
     queryFn: getUserPreferences,
     queryKey: null,
