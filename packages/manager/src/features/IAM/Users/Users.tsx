@@ -1,7 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Action, ActionMenu } from 'src/components/ActionMenu/ActionMenu';
+
+import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { useProfile } from 'src/queries/profile/profile';
+
+import type { Action } from 'src/components/ActionMenu/ActionMenu';
 
 export const UsersLanding = () => {
   const history = useHistory();
