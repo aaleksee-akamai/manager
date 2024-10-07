@@ -5,8 +5,36 @@ import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
+import { Permissions } from '../Permissions/Permissions';
 
 type Props = RouteComponentProps<{}>;
+
+const mockUserPermissions = {
+  resourceType: 'account',
+  roles: [
+    {
+      name: 'accountAdmin',
+      description:
+        'Access to perform any supported action on all resources in the account',
+      permissions: [
+        'delete_linode',
+        'initiate_linode_migration',
+        'update_linode',
+        'view_linode',
+        'boot_linode',
+        'clone_linode',
+        'upgrade_linode',
+        'reboot_linode',
+        'list_linode',
+        'rebuild_linode',
+        'rescue_linode',
+        'reside_linode',
+        'shutdown_linode',
+        'password_reset_linode',
+      ],
+    },
+  ],
+};
 
 const UsersLanding = React.memo((props: Props) => {
   const tabs = [
@@ -41,7 +69,7 @@ const UsersLanding = React.memo((props: Props) => {
         <TabLinkList tabs={tabs} />
 
         <React.Suspense fallback={<SuspenseLoader />}>
-          <TabPanels>
+          <TabPanels sx={{ outline: '1px dashed' }}>
             <SafeTabPanel index={0}>
               <h3>User Avatar</h3>
               <p>Username</p>
@@ -49,6 +77,7 @@ const UsersLanding = React.memo((props: Props) => {
             </SafeTabPanel>
             <SafeTabPanel index={1}>
               <h3>Assigned Roles</h3>
+              <Permissions userPermissions={mockUserPermissions} />
               <p>Table</p>
               <h3>Look Up Role By Reference</h3>
               <p>Table</p>
