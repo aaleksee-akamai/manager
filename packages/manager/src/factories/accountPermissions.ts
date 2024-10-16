@@ -32,6 +32,7 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
           {
             name: 'firewall_creator',
             description: 'Access to create a firewall instance',
+            permissions: ['create_linode', 'update_linode', 'delete_linode'],
           },
         ],
       },
@@ -53,11 +54,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
           {
             name: 'firewall_viewer',
             description: 'Access to view a firewall instance',
+            permissions: ['create_linode', 'update_linode', 'delete_linode'],
           },
           {
             name: 'firewall_admin',
             description:
               'Access to perform any supported action on a firewall instance',
+            permissions: ['create_linode', 'update_linode', 'delete_linode'],
           },
         ],
       },
