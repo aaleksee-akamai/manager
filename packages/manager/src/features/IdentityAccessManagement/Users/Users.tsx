@@ -5,8 +5,27 @@ import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
+import { Resources } from '../Resources/Resources';
 
 type Props = RouteComponentProps<{}>;
+
+const mockUserResources = {
+  resource_type: 'linode',
+  resources: [
+    {
+      resource_name: 'linode-us-123',
+      resource_id: '12345678',
+    },
+    {
+      resource_name: 'linode-uk-123',
+      resource_id: '23456789',
+    },
+    {
+      resource_name: 'db-us-southeast1',
+      resource_id: '456728',
+    },
+  ],
+};
 
 const UsersLanding = React.memo((props: Props) => {
   const tabs = [
@@ -46,6 +65,7 @@ const UsersLanding = React.memo((props: Props) => {
               <h3>User Avatar</h3>
               <p>Username</p>
               <p>Email</p>
+              <Resources userResources={mockUserResources} />
             </SafeTabPanel>
             <SafeTabPanel index={1}>
               <h3>Assigned Roles</h3>
