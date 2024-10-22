@@ -33,6 +33,7 @@ const options: { flag: keyof Flags; label: string }[] = [
   { flag: 'databaseResize', label: 'Database Resize' },
   { flag: 'apicliDxToolsAdditions', label: 'APICLI DX Tools Additions' },
   { flag: 'apicliButtonCopy', label: 'APICLI Button Copy' },
+  { flag: 'iam', label: 'Identity and Access Beta' },
 ];
 
 const renderFlagItems = (

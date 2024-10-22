@@ -32,6 +32,7 @@ import { useIsPlacementGroupsEnabled } from 'src/features/PlacementGroups/utils'
 import { useFlags } from 'src/hooks/useFlags';
 import { usePrefetch } from 'src/hooks/usePreFetch';
 import { useAccountSettings } from 'src/queries/account/settings';
+import { useIsIAMEnabled } from 'src/features/IAM/utilities';
 
 import useStyles from './PrimaryNav.styles';
 import { linkIsActive } from './utils';
@@ -96,6 +97,8 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
 
   const { isPlacementGroupsEnabled } = useIsPlacementGroupsEnabled();
   const { isDatabasesEnabled, isDatabasesV2Beta } = useIsDatabasesEnabled();
+
+  const { isIAMEnabled, isIAMBeta } = useIsIAMEnabled();
 
   const primaryLinkGroups: PrimaryLink[][] = React.useMemo(
     () => [
@@ -206,8 +209,10 @@ export const PrimaryNav = (props: PrimaryNavProps) => {
       [
         {
           display: 'Identity and Access',
+          hide: !isIAMEnabled,
           href: '/iam',
           icon: <IAM />,
+          isBeta: isIAMBeta,
         },
         {
           display: 'Account',

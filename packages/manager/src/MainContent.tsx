@@ -32,6 +32,7 @@ import { switchAccountSessionContext } from './context/switchAccountSessionConte
 import { useIsACLPEnabled } from './features/CloudPulse/Utils/utils';
 import { useIsDatabasesEnabled } from './features/Databases/utilities';
 import { useIsPlacementGroupsEnabled } from './features/PlacementGroups/utils';
+import { useIsIAMEnabled } from './features/IAM/utilities';
 import { useGlobalErrors } from './hooks/useGlobalErrors';
 import { useAccountSettings } from './queries/account/settings';
 import { useProfile } from './queries/profile/profile';
@@ -196,7 +197,7 @@ const CloudPulse = React.lazy(() =>
   }))
 );
 
-const IdentityAccessManagement = React.lazy(() =>
+const IAM = React.lazy(() =>
   import('src/features/IAM').then((module) => ({
     default: module.IdentityAccessManagement,
   }))
@@ -238,6 +239,8 @@ export const MainContent = () => {
   const defaultRoot = accountSettings?.managed ? '/managed' : '/linodes';
 
   const { isACLPEnabled } = useIsACLPEnabled();
+
+  const { isIAMEnabled } = useIsIAMEnabled();
 
   /**
    * this is the case where the user has successfully completed signup
@@ -353,10 +356,9 @@ export const MainContent = () => {
                             path="/object-storage"
                           />
                           <Route component={Kubernetes} path="/kubernetes" />
-                          <Route
-                            component={IdentityAccessManagement}
-                            path="/iam"
-                          />
+                          {isIAMEnabled && (
+                            <Route component={IAM} path="/iam" />
+                          )}
                           <Route component={Account} path="/account" />
                           <Route component={Profile} path="/profile" />
                           <Route component={Help} path="/support" />

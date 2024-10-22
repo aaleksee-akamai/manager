@@ -6,18 +6,10 @@ import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 import { Button } from 'src/components/Button/Button';
 
-// type LocationState = {
-//   selectedRole: 'account' | 'resource';
-// };
-
 export const EditRole = () => {
   const location = useLocation();
   const { username } = useParams<{ username: string }>();
   const history = useHistory();
-
-  // const selectedRole = location.state?.selectedRole;
-
-  // console.log('selectedRole:', selectedRole);
 
   const handleCancel = () => {
     history.push(`/iam/users/${username}/roles`);
