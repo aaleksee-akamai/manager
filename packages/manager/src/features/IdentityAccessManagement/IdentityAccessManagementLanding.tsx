@@ -10,6 +10,7 @@ import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
 
 import type { RouteComponentProps } from 'react-router-dom';
+
 type Props = RouteComponentProps<{}>;
 
 const Users = React.lazy(() =>

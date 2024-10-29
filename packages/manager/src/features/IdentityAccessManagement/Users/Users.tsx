@@ -1,6 +1,11 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
+
+const user = {
+  username: 'aaleksee-akamai',
+};
 
 export const UsersLanding = () => {
   const history = useHistory();
@@ -8,13 +13,17 @@ export const UsersLanding = () => {
   const actions: any[] = [
     {
       onClick: () => {
-        history.push(`/identity-access-management/users/name/details`);
+        history.push(
+          `/identity-access-management/users/${user.username}/details`
+        );
       },
       title: 'View User Details',
     },
     {
       onClick: () => {
-        history.push(`/identity-access-management/users/name/roles`);
+        history.push(
+          `/identity-access-management/users/${user.username}/roles`
+        );
       },
       title: 'View User Roles',
     },

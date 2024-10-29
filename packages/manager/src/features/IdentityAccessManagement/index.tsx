@@ -11,8 +11,8 @@ const IdentityAccessManagementLanding = React.lazy(
 );
 
 const UserDetails = React.lazy(() =>
-  import('./UserDetails').then((module) => ({
-    default: module.UserDetails,
+  import('./UserDetailsLanding').then((module) => ({
+    default: module.UserDetailsLanding,
   }))
 );
 
@@ -25,7 +25,7 @@ export const IdentityAccessManagement: React.FC<CombinedProps> = (props) => {
     <React.Suspense fallback={<SuspenseLoader />}>
       <ProductInformationBanner bannerLocation="Identity and Access Management" />
       <Switch>
-        <Route component={UserDetails} path={`${path}/users/name/`} />
+        <Route component={UserDetails} path={`${path}/users/:username`} />
 
         <Redirect exact from={path} to={`${path}/users`} />
 

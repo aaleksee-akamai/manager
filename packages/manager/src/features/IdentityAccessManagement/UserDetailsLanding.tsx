@@ -1,24 +1,30 @@
 import React from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import {
+  useHistory,
+  useLocation,
+  useParams,
+  matchPath,
+} from 'react-router-dom';
+
 import { LandingHeader } from 'src/components/LandingHeader';
 import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
-import { matchPath } from 'react-router-dom';
+import { UserProfile } from './UserProfile/UserProfile';
 
-export const UserDetails = () => {
+export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();
   const location = useLocation();
   const history = useHistory();
 
   const tabs = [
     {
-      routeName: `/identity-access-management/users/name/details`,
+      routeName: `/identity-access-management/users/${username}/details`,
       title: 'User Details',
     },
     {
-      routeName: `/identity-access-management/users/name/roles`,
+      routeName: `/identity-access-management/users/${username}/roles`,
       title: 'User Roles',
     },
   ];
@@ -53,10 +59,13 @@ export const UserDetails = () => {
         <TabLinkList tabs={tabs} />
         <TabPanels>
           <SafeTabPanel index={idx}>
-            <p>user details - UIE-8137</p>
+            <UserProfile />
           </SafeTabPanel>
           <SafeTabPanel index={++idx}>
-            <p>user roles</p>
+            <p>UIE-8138 - User Roles - Assigned Roles Table</p>
+            <p>UIE-8139 - User Roles - Assign New Role</p>
+            <p>UIE-8140 - User Roles - Assign New Role</p>
+            <p>UIE-8141 - User Roles - Edit Assignment</p>
           </SafeTabPanel>
         </TabPanels>
       </Tabs>
