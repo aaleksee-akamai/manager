@@ -5,6 +5,7 @@ import {
   useParams,
   matchPath,
 } from 'react-router-dom';
+
 import { LandingHeader } from 'src/components/LandingHeader';
 import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
@@ -13,6 +14,7 @@ import { Tabs } from 'src/components/Tabs/Tabs';
 import { AssignNewRoleMenu } from './AssignNewRoleMenu';
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { IAM_LABEL } from './constants';
+import { UserProfile } from './UserProfile/UserProfile';
 
 export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();
@@ -81,7 +83,7 @@ export const UserDetailsLanding = () => {
         <TabLinkList tabs={tabs} />
         <TabPanels>
           <SafeTabPanel index={idx}>
-            <p>user details - UIE-8137</p>
+            <UserProfile />
           </SafeTabPanel>
           <SafeTabPanel index={++idx}>
             <p>UIE-8138 - User Roles - Assigned Roles Table</p>
