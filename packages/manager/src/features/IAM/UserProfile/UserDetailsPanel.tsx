@@ -32,7 +32,7 @@ export const UserDetailsPanel = ({ user, assignRoles }: Props) => {
       label: 'Access',
       value: assignRolesCount ? (
         <Typography>
-          <Link to={`/identity-access-management/users/${user.username}/roles`}>
+          <Link to={`/iam/users/${user.username}/roles`}>
             {`${assignRolesCount} role${
               assignRolesCount !== 1 ? 's' : ''
             } assigned`}

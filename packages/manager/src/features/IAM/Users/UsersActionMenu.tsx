@@ -19,7 +19,7 @@ export const UsersActionMenu = ({ isProxyUser, onDelete, username }: Props) => {
   const proxyUserActions: Action[] = [
     {
       onClick: () => {
-        history.push(`/identity-access-management/users/${username}/roles`);
+        history.push(`/iam/users/${username}/roles`);
       },
       title: 'Manage Access',
     },
@@ -28,13 +28,13 @@ export const UsersActionMenu = ({ isProxyUser, onDelete, username }: Props) => {
   const nonProxyUserActions: Action[] = [
     {
       onClick: () => {
-        history.push(`/identity-access-management/users/${username}/details`);
+        history.push(`/iam/users/${username}/details`);
       },
       title: 'View User Details',
     },
     {
       onClick: () => {
-        history.push(`/identity-access-management/users/${username}/roles`);
+        history.push(`/iam/users/${username}/roles`);
       },
       title: 'View User Roles',
     },

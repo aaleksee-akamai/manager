@@ -1,8 +1,8 @@
 import React from 'react';
 import { renderWithTheme } from 'src/utilities/testHelpers';
-import { UsersActionMenu } from './UsersActionMenu';
 import { profileFactory } from 'src/factories';
 import { fireEvent } from '@testing-library/react';
+import { UsersActionMenu } from './UsersActionMenu';
 
 const queryMocks = vi.hoisted(() => ({
   useProfile: vi.fn().mockReturnValue({}),
@@ -62,9 +62,7 @@ describe('UsersActionMenu', () => {
 
     // Click "Manage Access" and verify history.push is called with the correct URL
     fireEvent.click(manageAccessButton);
-    expect(mockHistory.push).toHaveBeenCalledWith(
-      '/identity-access-management/users/test_user/roles'
-    );
+    expect(mockHistory.push).toHaveBeenCalledWith('/iam/users/test_user/roles');
   });
 
   it('should render non-proxy user actions correctly', () => {
@@ -91,7 +89,7 @@ describe('UsersActionMenu', () => {
     // Click "View User Details" and verify history.push is called with the correct URL
     fireEvent.click(viewDetailsButton);
     expect(mockHistory.push).toHaveBeenCalledWith(
-      '/identity-access-management/users/test_user/details'
+      '/iam/users/test_user/details'
     );
 
     // Check if "View User Roles" action is present
@@ -100,9 +98,7 @@ describe('UsersActionMenu', () => {
 
     // Click "View User Roles" and verify history.push is called with the correct URL
     fireEvent.click(viewRolesButton);
-    expect(mockHistory.push).toHaveBeenCalledWith(
-      '/identity-access-management/users/test_user/roles'
-    );
+    expect(mockHistory.push).toHaveBeenCalledWith('/iam/users/test_user/roles');
 
     // Check if "Delete User" action is present
     const deleteUserButton = getByText('Delete User');

@@ -14,10 +14,9 @@ import { Typography } from 'src/components/Typography';
 import { useProfile } from 'src/queries/profile/profile';
 import { capitalize } from 'src/utilities/capitalize';
 
-import { UsersActionMenu } from './UsersActionMenu';
-
 import type { User } from '@linode/api-v4';
 import { Link } from 'react-router-dom';
+import { UsersActionMenu } from './UsersActionMenu';
 
 interface Props {
   onDelete: (username: string) => void;
@@ -44,9 +43,7 @@ export const UserRow = ({ onDelete, user }: Props) => {
             username={user.username}
           />
           <Typography>
-            <Link
-              to={`/identity-access-management/users/${user.username}/details`}
-            >
+            <Link to={`/iam/users/${user.username}/details`}>
               {user.username}
             </Link>
           </Typography>
