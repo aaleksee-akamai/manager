@@ -2,6 +2,7 @@ import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import { Avatar } from 'src/components/Avatar/Avatar';
+
 import { DateTimeDisplay } from 'src/components/DateTimeDisplay';
 import { Hidden } from 'src/components/Hidden';
 import { StatusIcon } from 'src/components/StatusIcon/StatusIcon';
@@ -10,10 +11,11 @@ import { TableRow } from 'src/components/TableRow';
 import { useProfile } from 'src/queries/profile/profile';
 import { capitalize } from 'src/utilities/capitalize';
 
+import { UsersActionMenu } from './UsersActionMenu';
+
 import type { User } from '@linode/api-v4';
 import { Link } from 'react-router-dom';
-import { UsersActionMenu } from './UsersActionMenu';
-import { Stack, Typography, Box, Chip } from '@linode/ui';
+import { Box, Chip, Stack, Typography } from '@linode/ui';
 
 interface Props {
   onDelete: (username: string) => void;
@@ -40,7 +42,9 @@ export const UserRow = ({ onDelete, user }: Props) => {
             username={user.username}
           />
           <Typography>
-            <Link to={`/iam/users/${user.username}/details`}>
+            <Link
+              to={`/identity-access-management/users/${user.username}/details`}
+            >
               {user.username}
             </Link>
           </Typography>
