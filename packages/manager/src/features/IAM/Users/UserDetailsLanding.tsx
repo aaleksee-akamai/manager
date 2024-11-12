@@ -5,15 +5,25 @@ import {
   useParams,
   matchPath,
 } from 'react-router-dom';
+
 import { LandingHeader } from 'src/components/LandingHeader';
 import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
+// import { useAccountUserPermissions } from 'src/queries/iam/iam';
+
+import { UserProfile } from './UserDetails/UserProfile';
+import { UserRoles } from './UserRoles/UserRoles';
 import { IAM_LABEL } from '../Shared/constants';
+import { UserResources } from './UserResources';
+
+const assignedRoles = {};
 
 export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();
+  // const { data: assignedRoles } = useAccountUserPermissions(username ?? '');
+
   const location = useLocation();
   const history = useHistory();
 
@@ -68,13 +78,13 @@ export const UserDetailsLanding = () => {
         <TabLinkList tabs={tabs} />
         <TabPanels>
           <SafeTabPanel index={idx}>
-            <p>user details - UIE-8137</p>
+            <UserProfile assignedRoles={assignedRoles ?? {}} />
           </SafeTabPanel>
           <SafeTabPanel index={++idx}>
-            <p>UIE-8138 - User Roles - Assigned Roles Table</p>
+            <UserRoles assignedRoles={assignedRoles ?? {}} />
           </SafeTabPanel>
           <SafeTabPanel index={++idx}>
-            <p>Resources</p>
+            <UserResources assignedRoles={assignedRoles ?? {}} />
           </SafeTabPanel>
         </TabPanels>
       </Tabs>

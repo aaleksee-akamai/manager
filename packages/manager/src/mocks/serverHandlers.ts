@@ -128,6 +128,9 @@ import type {
   User,
   VolumeStatus,
 } from '@linode/api-v4';
+import { accountPermissionsFactory } from 'src/factories/accountPermissions';
+import { userPermissionsFactory } from 'src/factories/userPermissions';
+import { accountResourcesFactory } from 'src/factories/accountResources';
 
 export const makeResourcePage = <T>(
   e: T[],
@@ -388,6 +391,21 @@ const vpc = [
     const body = await request.json();
     const subnet = subnetFactory.build({ ...(body as any) });
     return HttpResponse.json(subnet);
+  }),
+];
+
+const iam = [
+  http.get('*/iam/role-permissions', () => {
+    return HttpResponse.json(accountPermissionsFactory.build());
+  }),
+  http.get('*/iam/role-permissions/users/:username', () => {
+    return HttpResponse.json(userPermissionsFactory.build());
+  }),
+];
+
+const resources = [
+  http.get('*/resources', () => {
+    return HttpResponse.json(accountResourcesFactory.build());
   }),
 ];
 
@@ -2666,4 +2684,6 @@ export const handlers = [
   ...statusPage,
   ...databases,
   ...vpc,
+  ...iam,
+  ...resources,
 ];
