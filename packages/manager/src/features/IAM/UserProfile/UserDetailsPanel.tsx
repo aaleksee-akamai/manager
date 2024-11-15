@@ -9,11 +9,11 @@ import { TextTooltip } from 'src/components/TextTooltip';
 import { Typography } from 'src/components/Typography';
 import { Link } from 'src/components/Link';
 
-import type { User, UserPermissions } from '@linode/api-v4';
+import type { User, IamUserPermissions } from '@linode/api-v4';
 
 interface Props {
   user: User;
-  assignRoles: UserPermissions | {};
+  assignRoles: IamUserPermissions | {};
 }
 
 export const UserDetailsPanel = ({ user, assignRoles }: Props) => {
