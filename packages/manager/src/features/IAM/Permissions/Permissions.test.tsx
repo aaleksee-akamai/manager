@@ -3,21 +3,13 @@ import React from 'react';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 
 import { Permissions } from './Permissions';
+import { Roles } from '@linode/api-v4/lib/iam/types';
 
-const mockUserPermissions = {
-  resourceType: 'account',
-  roles: [
-    {
-      name: 'accountAdmin',
-      description:
-        'Access to perform any supported action on all resources in the account',
-      permissions: [
-        'delete_linode',
-        'initiate_linode_migration',
-        'update_linode',
-      ],
-    },
-  ],
+const mockUserPermissions: Roles = {
+  name: 'accountAdmin',
+  description:
+    'Access to perform any supported action on all resources in the account',
+  permissions: ['delete_linode', 'create_linode', 'update_linode'],
 };
 
 describe('Permissions', () => {

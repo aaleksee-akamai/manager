@@ -3,17 +3,18 @@ import { renderWithTheme } from 'src/utilities/testHelpers';
 
 import { Resources } from './Resources';
 import { fireEvent } from '@testing-library/react';
+import { IamAccountResource } from '@linode/api-v4/lib/resources/types';
 
-const mockUserResources = {
+const mockUserResources: IamAccountResource = {
   resource_type: 'linode',
   resources: [
     {
-      resource_name: 'linode-uk-123',
-      resource_id: '23456789',
+      name: 'linode-uk-123',
+      id: 23456789,
     },
     {
-      resource_name: 'db-us-southeast1',
-      resource_id: '456728',
+      name: 'db-us-southeast1',
+      id: 456728,
     },
   ],
 };

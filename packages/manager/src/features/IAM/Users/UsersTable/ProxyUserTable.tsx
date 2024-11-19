@@ -4,10 +4,10 @@ import { Table } from 'src/components/Table';
 import { TableBody } from 'src/components/TableBody';
 import { Typography } from 'src/components/Typography';
 import { PARENT_USER } from 'src/features/Account/constants';
-import { UsersLandingProxyTableHead } from '../Users/UsersLandingProxyTableHead';
-import { UsersLandingTableBody } from '../Users/UsersLandingTableBody';
 import { useAccountUsers } from 'src/queries/account/users';
 import { Order } from './UsersLandingTableHead';
+import { UsersLandingProxyTableHead } from './UsersLandingProxyTableHead';
+import { UsersLandingTableBody } from './UsersLandingTableBody';
 
 interface Props {
   order: Order;

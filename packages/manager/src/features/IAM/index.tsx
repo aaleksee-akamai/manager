@@ -9,13 +9,13 @@ import type { RouteComponentProps } from 'react-router-dom';
 const IAMLanding = React.lazy(() => import('./IAMLanding'));
 
 const UserDetails = React.lazy(() =>
-  import('./UserDetailsLanding').then((module) => ({
+  import('./Users/UserDetailsLanding').then((module) => ({
     default: module.UserDetailsLanding,
   }))
 );
 
 const AssignNewRole = React.lazy(() =>
-  import('./AssignNewRole').then((module) => ({
+  import('./Users/UserRoles/AssignNewRole').then((module) => ({
     default: module.AssignNewRole,
   }))
 );

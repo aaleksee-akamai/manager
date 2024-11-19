@@ -26,8 +26,8 @@ export interface ResourceAccess {
 }
 
 export interface IamAccountPermissions {
-  account_access: Access[];
-  resource_access: Access[];
+  account_access: IamAccess[];
+  resource_access: IamAccess[];
 }
 
 type PermissionType =
@@ -37,7 +37,7 @@ type PermissionType =
   | 'delete_linode'
   | 'view_linode';
 
-interface Access {
+export interface IamAccess {
   resource_type: ResourceType;
   roles: Roles[];
 }

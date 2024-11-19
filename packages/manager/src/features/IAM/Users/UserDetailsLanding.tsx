@@ -11,10 +11,10 @@ import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
-import { AssignNewRoleMenu } from './AssignNewRoleMenu';
+import { AssignNewRoleMenu } from './UserRoles/AssignNewRoleMenu';
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
-import { IAM_LABEL } from './constants';
-import { UserProfile } from './UserProfile/UserProfile';
+import { IAM_LABEL } from '../constants';
+import { UserProfile } from './UserDetails/UserProfile';
 
 export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();

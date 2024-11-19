@@ -7,35 +7,21 @@ import {
   StyledTypography,
   sxTooltipIcon,
 } from './Permissions.style';
+import { Roles } from '@linode/api-v4/lib/iam/types';
 
-interface UserPermissionsProps {
-  resourceType: string;
-  roles: RoleProps[];
-}
-
-interface RoleProps {
-  name: string;
-  description: string;
-  permissions: string[];
-}
-
-type PermissionsProps = {
-  userPermissions: UserPermissionsProps;
+type Props = {
+  userPermissions: Roles;
 };
 
-export const Permissions = ({
-  userPermissions: { roles },
-}: PermissionsProps) => {
-  const permissions = roles.flatMap((role: RoleProps) =>
-    role.permissions.map((permission: string) => (
-      <StyledChip
-        label={permission}
-        key={permission}
-        data-testid="chip"
-        variant="outlined"
-      />
-    ))
-  );
+export const Permissions = ({ userPermissions }: Props) => {
+  const permissions = userPermissions.permissions?.map((permission: string) => (
+    <StyledChip
+      label={permission}
+      key={permission}
+      data-testid="chip"
+      variant="outlined"
+    />
+  ));
 
   return (
     <Grid container direction="column">

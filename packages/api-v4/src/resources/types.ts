@@ -1,4 +1,4 @@
-type ResourceType =
+export type ResourceType =
   | 'linode'
   | 'firewall'
   | 'nodebalancer'
@@ -13,7 +13,7 @@ type ResourceType =
 export type IamAccountResource = {
   resource_type: ResourceType;
   resources: Resource[];
-}[];
+};
 
 export interface Resource {
   name: string;

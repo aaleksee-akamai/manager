@@ -8,6 +8,7 @@ export const StyledChip = styled(Chip, { label: 'StyledChip' })(
   ({ theme }) => ({
     borderColor: '#C5C5CA',
     borderRadius: 4,
+    backgroundColor: '#FFFFFF',
     marginRight: theme.spacing(),
     marginTop: 0,
     marginBottom: theme.spacing(),

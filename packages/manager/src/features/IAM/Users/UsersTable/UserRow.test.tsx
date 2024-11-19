@@ -8,7 +8,6 @@ import {
   renderWithTheme,
   wrapWithTableBody,
 } from 'src/utilities/testHelpers';
-
 import { UserRow } from './UserRow';
 
 // Because the table row hides certain columns on small viewport sizes,

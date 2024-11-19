@@ -4,24 +4,15 @@ import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { Typography } from 'src/components/Typography';
 import { makeStyles } from 'tss-react/mui';
 import { Theme } from '@mui/material/styles';
+import { IamAccountResource, Resource } from '@linode/api-v4';
 
 type Props = {
-  userResources: AccountResource;
+  userResources: IamAccountResource;
 };
-
-type AccountResource = {
-  resource_type: string;
-  resources: Resource[];
-};
-
-interface Resource {
-  resource_name: string;
-  resource_id: string;
-}
 
 type ResourceOption = {
   label: string;
-  value: string;
+  value: number;
 };
 
 const useStyles = makeStyles()((theme: Theme) => ({
@@ -89,8 +80,8 @@ const getPlaceholder = (type: string) =>
 
 const transformedResources = (resources: Resource[]): ResourceOption[] => {
   const r = resources.map((resource) => ({
-    label: resource.resource_name,
-    value: resource.resource_id,
+    label: resource.name,
+    value: resource.id,
   }));
 
   return r;

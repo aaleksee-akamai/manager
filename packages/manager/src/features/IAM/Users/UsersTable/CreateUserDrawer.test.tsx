@@ -1,8 +1,8 @@
 import React from 'react';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 import { fireEvent } from '@testing-library/react';
-import CreateUserDrawer from './CreateUserDrawer';
 import { HttpResponse, http, server } from 'src/mocks/testServer';
+import CreateUserDrawer from './CreateUserDrawer';
 
 const props = {
   onClose: vi.fn(),
