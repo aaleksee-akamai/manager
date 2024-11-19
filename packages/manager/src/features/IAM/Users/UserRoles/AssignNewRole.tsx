@@ -8,10 +8,14 @@ import { Button } from 'src/components/Button/Button';
 import { IAM_LABEL } from '../../constants';
 import { Paper } from '@mui/material';
 import { Typography } from 'src/components/Typography';
-// import { useAccountPermissions } from 'src/queries/iam/iam';
-// import { useAccountResources } from 'src/queries/resources/resources';
-// import { AssignedPermissionsPanel } from '../../AssignedPermissionsPanel/AssignedPermissionsPanel';
-// import { IamAccountResource } from '@linode/api-v4/lib/resources/types';
+import { useAccountPermissions } from 'src/queries/iam/iam';
+import { useAccountResources } from 'src/queries/resources/resources';
+import { AssignedPermissionsPanel } from '../../AssignedPermissionsPanel/AssignedPermissionsPanel';
+import {
+  IamAccountResource,
+  ResourceType,
+} from '@linode/api-v4/lib/resources/types';
+import { ResourceTypePermissions, Roles } from '@linode/api-v4/lib/iam/types';
 
 type LocationState = {
   selectedRole: 'account' | 'resource' | 'all_roles';
@@ -20,30 +24,33 @@ type LocationState = {
 export const AssignNewRole = () => {
   const location = useLocation<LocationState>();
   const { username } = useParams<{ username: string }>();
-  // const { data } = useAccountPermissions();
-  // const { data: resources } = useAccountResources();
-
-  // console.log('data', data?.account_access);
-  // console.log('resources', resources);
+  const { data } = useAccountPermissions();
+  const { data: resources } = useAccountResources();
 
   const history = useHistory();
 
-  const selectedRole = location.state?.selectedRole;
+  const selectedRoleType = location.state?.selectedRole;
 
-  // const roleAccount = data?.account_access[0]?.roles[0];
-  // console.log('roleAccount', roleAccount);
+  let roleAccount: Roles | undefined;
+  let roleResource: Roles | undefined;
+  let roleResourceType: ResourceType | ResourceTypePermissions;
+  let accountResources: IamAccountResource | undefined;
 
-  // const roleResource = data?.resource_access[0]?.roles[0];
-  // console.log('roleResource', roleResource);
-  // const roleResourceType = data?.resource_access[0]?.resource_type || '';
-  // console.log('roleResourceType', roleResourceType);
+  if (data) {
+    roleAccount = data.account_access[0].roles[0];
 
-  // const accountResources = resources ? getResourcesByType(resources, roleResourceType) : {};
-  // console.log(accountResources);
+    roleResource = data.resource_access[0].roles[0];
+
+    roleResourceType = data.resource_access[0].resource_type;
+
+    if (roleResourceType && resources) {
+      accountResources = getResourcesByType(roleResourceType, resources);
+    }
+  }
 
   const handleCancel = () => {
     // mock for cancelling
-    if (selectedRole !== 'all_roles') {
+    if (selectedRoleType !== 'all_roles') {
       history.push(`/iam/users/${username}/roles`);
     } else {
       history.push(`/iam/roles`);
@@ -52,6 +59,10 @@ export const AssignNewRole = () => {
 
   const handleSubmit = () => {
     // mock for submitting
+  };
+
+  const handleRemove = () => {
+    // console.log('click on remove ');
   };
 
   return (
@@ -72,22 +83,35 @@ export const AssignNewRole = () => {
         removeCrumbX={4}
         title="Assign New Roles"
       />
-      {selectedRole === 'account' && (
+      {selectedRoleType === 'account' && (
         <Paper sx={{ padding: 2 }}>
           <Typography>Assigning Account Role</Typography>
 
-          {/* {roleAccount && <AssignedPermissionsPanel selectedRole={selectedRole} role={roleAccount} />} */}
+          {roleAccount && (
+            <AssignedPermissionsPanel
+              selectedRoleType={selectedRoleType}
+              role={roleAccount}
+              onClick={handleRemove}
+            />
+          )}
         </Paper>
       )}
-      {selectedRole === 'resource' && (
+      {selectedRoleType === 'resource' && (
         <Paper sx={{ padding: 2 }}>
           <Typography>Assigning Resource Role</Typography>
 
-          {/* {roleResource && <AssignedPermissionsPanel selectedRole={selectedRole} role={roleResource} accountResources={accountResources} />} */}
+          {roleResource && (
+            <AssignedPermissionsPanel
+              selectedRoleType={selectedRoleType}
+              role={roleResource}
+              accountResources={accountResources!}
+              onClick={handleRemove}
+            />
+          )}
         </Paper>
       )}
 
-      {selectedRole === 'all_roles' && (
+      {selectedRoleType === 'all_roles' && (
         <div>
           <h2>Choose User</h2>
         </div>
@@ -103,16 +127,16 @@ export const AssignNewRole = () => {
   );
 };
 
-// const getResourcesByType = (resources: IamAccountResource, roleResourceType: string) => {
+const getResourcesByType = (
+  roleResourceType: ResourceType | ResourceTypePermissions,
+  resources: IamAccountResource
+): IamAccountResource | undefined => {
+  const resourceArray: IamAccountResource[] = Object.values(resources);
 
-//   // console.log('resources', resources[0]);
+  // Find the first matching resource by resource_type
+  const resource = resourceArray.find(
+    (item: IamAccountResource) => item.resource_type === roleResourceType
+  );
 
-//   // Find the first matching resource by resource_type
-//   const resource = Object.values(resources).find(
-//     (item: any) => item.resource_type === roleResourceType
-//   );
-
-//   console.log('resource', resource);
-
-//   return resource || {};
-// };
+  return resource;
+};

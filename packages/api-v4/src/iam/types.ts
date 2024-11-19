@@ -2,7 +2,8 @@ export interface IamUserPermissions {
   account_access: AccountAccessType[];
   resource_access: ResourceAccess[];
 }
-type ResourceType =
+
+export type ResourceTypePermissions =
   | 'linode'
   | 'firewall'
   | 'nodebalancer'
@@ -14,14 +15,16 @@ type ResourceType =
   | 'database'
   | 'account'
   | 'vpc';
+
 type AccountAccessType =
   | 'account_linode_admin'
   | 'linode_creator'
   | 'firewall_creator';
+
 type RoleType = 'linode_contributor' | 'firewall_admin';
 export interface ResourceAccess {
   resource_id: number;
-  resource_type: ResourceType;
+  resource_type: ResourceTypePermissions;
   roles: RoleType[];
 }
 
@@ -38,7 +41,7 @@ type PermissionType =
   | 'view_linode';
 
 export interface IamAccess {
-  resource_type: ResourceType;
+  resource_type: ResourceTypePermissions;
   roles: Roles[];
 }
 

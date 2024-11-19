@@ -10,10 +10,10 @@ export type ResourceType =
   | 'database'
   | 'vpc';
 
-export type IamAccountResource = {
+export interface IamAccountResource {
   resource_type: ResourceType;
   resources: Resource[];
-};
+}
 
 export interface Resource {
   name: string;
