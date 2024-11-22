@@ -11,7 +11,7 @@ describe('UserDetailsPanel', () => {
     const assign_roles = {};
 
     const { getByText } = renderWithTheme(
-      <UserDetailsPanel user={user} assignRoles={assign_roles} />
+      <UserDetailsPanel user={user} assignedRoles={assign_roles} />
     );
 
     expect(getByText('Username')).toBeVisible();
@@ -26,7 +26,7 @@ describe('UserDetailsPanel', () => {
     const assign_roles = {};
 
     const { getByText } = renderWithTheme(
-      <UserDetailsPanel user={user} assignRoles={assign_roles} />
+      <UserDetailsPanel user={user} assignedRoles={assign_roles} />
     );
 
     expect(getByText('Access')).toBeVisible();
@@ -56,7 +56,7 @@ describe('UserDetailsPanel', () => {
     };
 
     const { getByText } = renderWithTheme(
-      <UserDetailsPanel user={user} assignRoles={assign_roles} />
+      <UserDetailsPanel user={user} assignedRoles={assign_roles} />
     );
 
     expect(getByText('Access')).toBeVisible();
@@ -81,7 +81,7 @@ describe('UserDetailsPanel', () => {
     };
 
     const { getByText } = renderWithTheme(
-      <UserDetailsPanel user={user} assignRoles={assign_roles} />
+      <UserDetailsPanel user={user} assignedRoles={assign_roles} />
     );
 
     expect(getByText('Access')).toBeVisible();
@@ -95,7 +95,7 @@ describe('UserDetailsPanel', () => {
     const assign_roles = {};
 
     const { getByText } = renderWithTheme(
-      <UserDetailsPanel user={user} assignRoles={assign_roles} />
+      <UserDetailsPanel user={user} assignedRoles={assign_roles} />
     );
 
     expect(getByText('Verified Phone Number')).toBeVisible();
@@ -107,7 +107,7 @@ describe('UserDetailsPanel', () => {
     const assign_roles = {};
 
     const { getByText } = renderWithTheme(
-      <UserDetailsPanel user={user} assignRoles={assign_roles} />
+      <UserDetailsPanel user={user} assignedRoles={assign_roles} />
     );
 
     expect(getByText('2FA')).toBeVisible();

@@ -13,11 +13,11 @@ import type { User, IamUserPermissions } from '@linode/api-v4';
 
 interface Props {
   user: User;
-  assignRoles: IamUserPermissions | {};
+  assignedRoles: IamUserPermissions | {};
 }
 
-export const UserDetailsPanel = ({ user, assignRoles }: Props) => {
-  const assignRolesCount = getAssignRoles(assignRoles);
+export const UserDetailsPanel = ({ user, assignedRoles }: Props) => {
+  const assignRolesCount = getAssignRoles(assignedRoles);
 
   const items = [
     {
