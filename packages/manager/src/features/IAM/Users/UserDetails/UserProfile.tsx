@@ -7,18 +7,21 @@ import { ErrorState } from 'src/components/ErrorState/ErrorState';
 import { NotFound } from 'src/components/NotFound';
 import { Stack } from 'src/components/Stack';
 import { useAccountUser } from 'src/queries/account/users';
-import { useAccountUserPermissions } from 'src/queries/iam/iam';
 
 import { DeleteUserPanel } from './DeleteUserPanel';
 import { UserDetailsPanel } from './UserDetailsPanel';
 import { UserEmailPanel } from './UserEmailPanel';
 import { UsernamePanel } from './UsernamePanel';
+import type { IamUserPermissions } from '@linode/api-v4';
 
-export const UserProfile = () => {
+interface Props {
+  assignedRoles: IamUserPermissions | {};
+}
+
+export const UserProfile = ({ assignedRoles }: Props) => {
   const { username } = useParams<{ username: string }>();
 
   const { data: user, error, isLoading } = useAccountUser(username ?? '');
-  const { data: assignRoles } = useAccountUserPermissions(username ?? '');
 
   if (isLoading) {
     return <CircleProgress />;
@@ -36,7 +39,7 @@ export const UserProfile = () => {
     <>
       <DocumentTitleSegment segment={`${username} - Profile`} />
       <Stack spacing={2}>
-        <UserDetailsPanel user={user} assignRoles={assignRoles ?? {}} />
+        <UserDetailsPanel user={user} assignedRoles={assignedRoles ?? {}} />
         <UsernamePanel user={user} />
         <UserEmailPanel user={user} />
         <DeleteUserPanel user={user} />

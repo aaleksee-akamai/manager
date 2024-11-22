@@ -21,3 +21,7 @@ export const useIsIAMEnabled = () => {
     isIAMBeta: flags.iam?.beta,
   };
 };
+
+export const isObjNotEmpty = (obj: any) => {
+  return Object.keys(obj).length !== 0;
+};
