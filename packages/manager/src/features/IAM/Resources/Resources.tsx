@@ -6,7 +6,6 @@ import {
   IamAccessType,
   IamAccountResource,
   Resource,
-  // Resource,
   ResourceType,
   ResourceTypePermissions,
   Roles,
@@ -28,39 +27,9 @@ type ResourceOption = {
   value: number;
 };
 
-const StyledTypography = styled(Typography, {
-  label: 'StyledTypography',
-})(({ theme }) => ({
-  color: '#32363C',
-  fontSize: '14px',
-  fontFamily: theme.font.bold,
-  marginBottom: `-${theme.spacing(2)}`,
-}));
-
-// const mockUserResources = {
-//   resource_type: 'linode',
-//   resources: [
-//     {
-//       resource_name: 'linode-us-123',
-//       resource_id: '12345678',
-//     },
-//     {
-//       resource_name: 'linode-uk-123',
-//       resource_id: '23456789',
-//     },
-//     {
-//       resource_name: 'db-us-southeast1',
-//       resource_id: '456728',
-//     },
-//   ],
-// };
-
 export const Resources = ({ role }: Props) => {
   const { data: resources } = useAccountResources();
-  // console.log('resources', resources);
-
   const { resource_type, access } = role;
-  // console.log('resource_type', resource_type);
 
   const [selectedResources, setSelectedResources] = React.useState<
     ResourceOption[]
@@ -155,3 +124,12 @@ const getResourcesByType = (
 
   return resource;
 };
+
+const StyledTypography = styled(Typography, {
+  label: 'StyledTypography',
+})(({ theme }) => ({
+  color: '#32363C',
+  fontSize: '14px',
+  fontFamily: theme.font.bold,
+  marginBottom: `-${theme.spacing(2)}`,
+}));
