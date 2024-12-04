@@ -1,22 +1,17 @@
 import { Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Button } from 'src/components/Button/Button';
 
 import { Chip } from 'src/components/Chip';
 import { Typography } from 'src/components/Typography';
 
-export const StyledChip = styled(Chip, { label: 'StyledChip' })(
-  ({ theme }) => ({
-    borderColor: '#C5C5CA',
-    borderRadius: 4,
-    backgroundColor: '#FFFFFF',
-    marginRight: theme.spacing(),
-    marginTop: 0,
-    marginBottom: theme.spacing(),
-    color: '#32363C',
-    fontSize: '14px',
-    height: theme.spacing(3),
-  })
-);
+export const StyledChip = styled(Chip, { label: 'StyledChip' })(({}) => ({
+  margin: 0,
+  color: '#32363C',
+  fontSize: '14px',
+  padding: 0,
+  border: 0,
+}));
 
 export const sxTooltipIcon = {
   padding: 0,
@@ -31,11 +26,20 @@ export const StyledTypography = styled(Typography, {
   color: '#32363C',
   fontSize: '14px',
   fontFamily: theme.font.bold,
+  marginBottom: 0,
 }));
 
-export const StyledGrid = styled(Grid, { label: 'StyledGrid' })(
+export const StyledGrid = styled(Grid, { label: 'StyledGrid' })(({}) => ({
+  marginBottom: 0,
+  alignItems: 'center',
+}));
+
+export const StyledButton = styled(Button, { label: 'StyledButton' })(
   ({ theme }) => ({
-    marginBottom: theme.spacing(1.5),
-    alignItems: 'center',
+    padding: 0,
+    minWidth: '60px',
+    fontSize: '14px',
+    fontFamily: theme.font.normal,
+    minHeight: '20px',
   })
 );
