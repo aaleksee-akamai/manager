@@ -2,12 +2,25 @@ import React from 'react';
 
 import { Autocomplete } from 'src/components/Autocomplete/Autocomplete';
 import { Typography } from 'src/components/Typography';
-import { makeStyles } from 'tss-react/mui';
-import { Theme } from '@mui/material/styles';
-import { IamAccountResource, Resource } from '@linode/api-v4';
+import {
+  IamAccessType,
+  IamAccountResource,
+  Resource,
+  // Resource,
+  ResourceType,
+  ResourceTypePermissions,
+  Roles,
+} from '@linode/api-v4';
+import { useAccountResources } from 'src/queries/resources/resources';
+import { styled } from '@mui/material/styles';
+
+interface ExtendedRole extends Roles {
+  resource_type: ResourceTypePermissions | ResourceType;
+  access: IamAccessType;
+}
 
 type Props = {
-  userResources: IamAccountResource;
+  role: ExtendedRole;
 };
 
 type ResourceOption = {
@@ -15,67 +28,109 @@ type ResourceOption = {
   value: number;
 };
 
-const useStyles = makeStyles()((theme: Theme) => ({
-  typeHeader: {
-    color: '#32363C',
-    fontSize: '14px',
-    fontFamily: theme.font.bold,
-    marginBottom: `-${theme.spacing()}`,
-  },
-  typeSpan: {
-    fontFamily: theme.font.normal,
-  },
-  select: {
-    maxWidth: 514,
-    '&& .MuiInput-root': {
-      maxWidth: 514,
-    },
-  },
+const StyledTypography = styled(Typography, {
+  label: 'StyledTypography',
+})(({ theme }) => ({
+  color: '#32363C',
+  fontSize: '14px',
+  fontFamily: theme.font.bold,
+  marginBottom: `-${theme.spacing(2)}`,
 }));
 
-export const Resources = ({ userResources }: Props) => {
-  const { classes } = useStyles();
+// const mockUserResources = {
+//   resource_type: 'linode',
+//   resources: [
+//     {
+//       resource_name: 'linode-us-123',
+//       resource_id: '12345678',
+//     },
+//     {
+//       resource_name: 'linode-uk-123',
+//       resource_id: '23456789',
+//     },
+//     {
+//       resource_name: 'db-us-southeast1',
+//       resource_id: '456728',
+//     },
+//   ],
+// };
 
-  const { resource_type, resources } = userResources;
+export const Resources = ({ role }: Props) => {
+  const { data: resources } = useAccountResources();
+  // console.log('resources', resources);
+
+  const { resource_type, access } = role;
+  // console.log('resource_type', resource_type);
+
   const [selectedResources, setSelectedResources] = React.useState<
     ResourceOption[]
   >([]);
 
-  const memoizedResources = React.useMemo(
-    () => transformedResources(resources),
-    [resources]
-  );
-  const placeholder =
-    selectedResources.length > 0 ? ' ' : getPlaceholder(resource_type);
+  // Update transformed resources and selected resources when resources or role change
+  React.useEffect(() => {
+    // Filter and transform resources based on role
+    if (access === 'resource_access' && resources) {
+      const resourcesByType = getResourcesByType(resource_type, resources);
+      const transformedResourcesList = resourcesByType
+        ? transformedResources(resourcesByType.resources)
+        : [];
+
+      // Initialize selected resources to transformed list
+      setSelectedResources(transformedResourcesList);
+    } else {
+      setSelectedResources([]);
+    }
+  }, [resources, access, resource_type]);
+
+  const placeholder = !!selectedResources.length
+    ? ' '
+    : getPlaceholder(resource_type);
 
   return (
     <>
-      <Typography className={classes.typeHeader}>
-        Resources <span className={classes.typeSpan}>(required)</span>
-      </Typography>
-      <Autocomplete
-        multiple
-        label=""
-        onChange={(_, value) => setSelectedResources(value)}
-        isOptionEqualToValue={(option, value) => option.label === value.label}
-        options={memoizedResources}
-        ListboxProps={{ sx: { overflowX: 'hidden' } }}
-        className={classes.select}
-        placeholder={placeholder}
-        renderOption={(props, option) => (
-          <li {...props} key={option.label}>
-            {option.label}
-          </li>
-        )}
-      />
+      <StyledTypography>Resources</StyledTypography>
+      {access === 'account_access' ? (
+        <Typography sx={{ marginTop: 2 }}>
+          All {resource_type} resources
+        </Typography>
+      ) : selectedResources.length ? (
+        <Autocomplete
+          multiple
+          label=""
+          value={selectedResources}
+          onChange={(_, value) => setSelectedResources(value)}
+          isOptionEqualToValue={(option, value) => option.label === value.label}
+          options={selectedResources}
+          ListboxProps={{ sx: { overflowX: 'hidden' } }}
+          placeholder={placeholder}
+          renderOption={(props, option) => (
+            <li {...props} key={option.label}>
+              {option.label}
+            </li>
+          )}
+        />
+      ) : (
+        <Typography sx={{ marginTop: 2 }}>
+          there are no resorces for this role
+        </Typography>
+      )}
     </>
   );
 };
 
-const getPlaceholder = (type: string) =>
+const getPlaceholder = (type: ResourceTypePermissions | ResourceType) =>
   ({
     linode: 'Select Linodes',
     firewall: 'Select Firewalls',
+    nodebalancer: 'Select Nodebalancer',
+    longview: 'Select Longview',
+    domain: 'Select Domain',
+    stackscript: 'Select Stackscript',
+    image: 'Select Image',
+    volume: 'Select Volume',
+    database: 'Select Database',
+    vpc: 'Select Vpc',
+    account: 'Select Account',
   }[type] || 'Select');
 
 const transformedResources = (resources: Resource[]): ResourceOption[] => {
@@ -85,4 +140,18 @@ const transformedResources = (resources: Resource[]): ResourceOption[] => {
   }));
 
   return r;
+};
+
+const getResourcesByType = (
+  roleResourceType: ResourceType | ResourceTypePermissions,
+  resources: IamAccountResource
+): IamAccountResource | undefined => {
+  const resourceArray: IamAccountResource[] = Object.values(resources);
+
+  // Find the first matching resource by resource_type
+  const resource = resourceArray.find(
+    (item: IamAccountResource) => item.resource_type === roleResourceType
+  );
+
+  return resource;
 };
