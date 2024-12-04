@@ -52,27 +52,6 @@ describe('Permissions', () => {
     expect(getByText('cancel_account')).toBeInTheDocument();
   });
 
-  // it('renders all permission chips when the width is smaller then parent container', () => {
-  //   const { getAllByTestId, getByText, queryByText } = renderWithTheme(
-  //     <Permissions role={mockAccountAcceessRole} />
-  //   );
-
-  //   // Mock the container's width to 390px
-  //   const container = getByText('Permissions').parentElement;
-  //   if (container) {
-  //     Object.defineProperty(container, 'offsetWidth', {
-  //       value: 390,
-  //       writable: true,
-  //     });
-  //   }
-
-  //   // Trigger the initial calculation without resizing
-  //   const visibleChips = getAllByTestId('chip');
-  //   expect(visibleChips.length).toBe(mockAccountAcceessRole.permissions.length); // All chips should be visible
-  //   expect(queryByText('Show All')).not.toBeInTheDocument();
-
-  // });
-
   it('renders only visible chips based on available space', () => {
     const { getAllByTestId, getByText, queryByText } = renderWithTheme(
       <Permissions role={mockAccountAcceessRoleLong} />
@@ -112,34 +91,21 @@ describe('Permissions', () => {
     expect(queryByText('Hide')).toBeInTheDocument();
   });
 
-  // it('hides extra permissions when "Hide" is clicked', async () => {
-  //   const { getAllByTestId, getByText, queryByText } = renderWithTheme(
-  //     <Permissions role={mockAccountAcceessRoleLong} />
-  //   );
-  //   // Click the "Show All" button first
-  //   const showAllButton = getByText('Show All');
-  //   fireEvent.click(showAllButton);
+  it('renders all chips when it is outside the drawer', () => {
+    const { getAllByTestId, getByText } = renderWithTheme(
+      <Permissions role={mockAccountAcceessRoleLong} />
+    );
 
-  //   // // Wait for all chips to be visible
-  //   // await waitFor(() => {
-  //   //   const visibleChips = getAllByTestId('chip');
-  //   //   expect(visibleChips.length).toBe(mockAccountAcceessRoleLong.permissions.length);
-  //   // });
+    // Mock the container's width to 800px
+    const container = getByText('Permissions').parentElement;
+    if (container) {
+      Object.defineProperty(container, 'offsetWidth', {
+        value: 800,
+        writable: true,
+      });
+    }
 
-  //   // Click the "Hide" button
-  //   const hideButton = getByText('Hide');
-  //   fireEvent.click(hideButton);
-
-  //   await new Promise((r) => setTimeout(r, 100));
-  //   const visibleChips = getAllByTestId('chip');
-  //   expect(visibleChips.length).toBeLessThan(mockAccountAcceessRoleLong.permissions.length);
-  //   // Wait for the hidden chips logic to take effect
-  //   // await waitFor(() => {
-  //   //   const visibleChips = getAllByTestId('chip');
-  //   //   expect(visibleChips.length).toBeLessThan(mockAccountAcceessRoleLong.permissions.length);
-  //   // });
-
-  //   // Ensure "Show All" button is visible again
-  //   expect(queryByText('Show All')).toBeInTheDocument();
-  // });
+    const allChips = getAllByTestId('chip');
+    expect(allChips.length).toBe(mockAccountAcceessRoleLong.permissions.length);
+  });
 });

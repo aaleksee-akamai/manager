@@ -26,11 +26,8 @@ type Props = {
 
 export const Permissions = ({ role }: Props) => {
   const permissions = role.permissions ?? [];
-  // console.log('userPermissions:', role);
 
-  // console.log('Permissions:', permissions);
-
-  const [showAll, setShowAll] = React.useState(false);
+  const [showAllBtn, setShowAllBtn] = React.useState(false);
   const [visibleChips, setVisibleChips] = React.useState<string[]>([]);
   const [hiddenChips, setHiddenChips] = React.useState<string[]>([]);
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -85,7 +82,7 @@ export const Permissions = ({ role }: Props) => {
   }, [calculateVisibleChips]);
 
   const handleToggle = () => {
-    setShowAll((prev) => !prev);
+    setShowAllBtn((prev) => !prev);
   };
 
   return (
@@ -93,6 +90,7 @@ export const Permissions = ({ role }: Props) => {
       container
       direction="column"
       ref={containerRef}
+      data-testid="parent"
       sx={{ marginBottom: 1 }}
     >
       <StyledGrid container item md={1}>
@@ -115,7 +113,7 @@ export const Permissions = ({ role }: Props) => {
           maxWidth: 'fit-content !important',
         }}
       >
-        {(showAll || !visibleChips.length ? permissions : visibleChips).map(
+        {(showAllBtn || !visibleChips.length ? permissions : visibleChips).map(
           (permission: string) => (
             <React.Fragment key={permission}>
               <StyledChip
@@ -129,13 +127,13 @@ export const Permissions = ({ role }: Props) => {
           )
         )}
 
-        {!showAll && !!hiddenChips.length && (
+        {!showAllBtn && !!hiddenChips.length && (
           <span style={{ paddingLeft: '3px' }}> +{hiddenChips.length} |</span>
         )}
 
         {!!hiddenChips.length && (
           <StyledButton onClick={handleToggle} variant="text">
-            {showAll ? 'Hide' : `Show All`}
+            {showAllBtn ? 'Hide' : `Show All`}
           </StyledButton>
         )}
       </Grid>
