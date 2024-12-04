@@ -1,35 +1,105 @@
 import * as React from 'react';
+
 import Grid from '@mui/material/Grid';
 import { TooltipIcon } from 'src/components/TooltipIcon';
 import {
+  StyledButton,
   StyledChip,
   StyledGrid,
   StyledTypography,
   sxTooltipIcon,
 } from './Permissions.style';
-import { Roles } from '@linode/api-v4/lib/iam/types';
+import {
+  IamAccessType,
+  ResourceTypePermissions,
+  Roles,
+} from '@linode/api-v4/lib/iam/types';
+
+interface ExtendedRole extends Roles {
+  resource_type: ResourceTypePermissions;
+  access: IamAccessType;
+}
 
 type Props = {
-  userPermissions: Roles;
+  role: ExtendedRole;
 };
 
-export const Permissions = ({ userPermissions }: Props) => {
-  const permissions = userPermissions.permissions?.map((permission: string) => (
-    <StyledChip
-      label={permission}
-      key={permission}
-      data-testid="chip"
-      variant="outlined"
-    />
-  ));
+export const Permissions = ({ role }: Props) => {
+  const permissions = role.permissions ?? [];
+  // console.log('userPermissions:', role);
+
+  // console.log('Permissions:', permissions);
+
+  const [showAll, setShowAll] = React.useState(false);
+  const [visibleChips, setVisibleChips] = React.useState<string[]>([]);
+  const [hiddenChips, setHiddenChips] = React.useState<string[]>([]);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const calculateVisibleChips = React.useCallback(() => {
+    if (!containerRef.current) return;
+
+    const chipElements = containerRef.current.querySelectorAll(
+      '[data-testid="chip"]'
+    );
+    const containerWidth = containerRef.current.offsetWidth - 90; // Leave space for "+X | Show All"
+    const isSmallContainer = containerWidth < 400; // Check if it's inside the drawer
+
+    if (!isSmallContainer) {
+      // If container is not located nside the drawer, show all permissions
+      setVisibleChips(permissions);
+      setHiddenChips([]);
+      return;
+    }
+
+    let accumulatedWidth = 0;
+    const visibleItems: string[] = [];
+    const hiddenItems: string[] = [];
+
+    for (const item of Array.from(chipElements)) {
+      const chipWidth = (item as HTMLElement).offsetWidth;
+      if (accumulatedWidth + chipWidth <= containerWidth) {
+        accumulatedWidth += chipWidth;
+        visibleItems.push(item.textContent || '');
+      } else {
+        const lastIdx = Array.from(chipElements).indexOf(item);
+        hiddenItems.push(
+          ...Array.from(chipElements)
+            .slice(lastIdx)
+            .map((chip) => chip.textContent || '')
+        );
+
+        break;
+      }
+    }
+
+    setVisibleChips(visibleItems);
+    setHiddenChips(hiddenItems);
+  }, [permissions]);
+
+  React.useEffect(() => {
+    calculateVisibleChips();
+    const handleResize = () => calculateVisibleChips();
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [calculateVisibleChips]);
+
+  const handleToggle = () => {
+    setShowAll((prev) => !prev);
+  };
 
   return (
-    <Grid container direction="column">
+    <Grid
+      container
+      direction="column"
+      ref={containerRef}
+      sx={{ marginBottom: 1 }}
+    >
       <StyledGrid container item md={1}>
         <StyledTypography>Permissions</StyledTypography>
         <TooltipIcon
           status="help"
-          text="Link is coming"
+          text="Link is coming..."
           sxTooltipIcon={sxTooltipIcon}
         />
       </StyledGrid>
@@ -39,9 +109,35 @@ export const Permissions = ({ userPermissions }: Props) => {
         columnSpacing={3}
         item
         md={11}
-        sx={{ margin: 0 }}
+        sx={{
+          margin: 0,
+          alignItems: 'center',
+          maxWidth: 'fit-content !important',
+        }}
       >
-        {permissions}
+        {(showAll || !visibleChips.length ? permissions : visibleChips).map(
+          (permission: string) => (
+            <React.Fragment key={permission}>
+              <StyledChip
+                label={permission}
+                key={permission}
+                data-testid="chip"
+                variant="outlined"
+              />
+              <span> | </span>
+            </React.Fragment>
+          )
+        )}
+
+        {!showAll && !!hiddenChips.length && (
+          <span style={{ paddingLeft: '3px' }}> +{hiddenChips.length} |</span>
+        )}
+
+        {!!hiddenChips.length && (
+          <StyledButton onClick={handleToggle} variant="text">
+            {showAll ? 'Hide' : `Show All`}
+          </StyledButton>
+        )}
       </Grid>
     </Grid>
   );
