@@ -25,7 +25,7 @@ const Roles = React.lazy(() =>
   }))
 );
 
-const IdentityAccessManagementLanding = React.memo((props: Props) => {
+export const IdentityAccessManagementLanding = React.memo((props: Props) => {
   const tabs = [
     {
       routeName: `${props.match.url}/users`,
@@ -83,5 +83,3 @@ const IdentityAccessManagementLanding = React.memo((props: Props) => {
     </>
   );
 });
-
-export default IdentityAccessManagementLanding;

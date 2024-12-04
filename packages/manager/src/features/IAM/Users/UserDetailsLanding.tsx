@@ -18,6 +18,8 @@ import { UserProfile } from './UserDetails/UserProfile';
 import { UserRoles } from './UserRoles/UserRoles';
 import { UserResources } from './UserResources';
 
+// const assignedRoles = {};
+
 export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();
   const { data: assignedRoles } = useAccountUserPermissions(username ?? '');
