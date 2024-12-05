@@ -20,8 +20,6 @@ type Props = {
 };
 
 export const AssignedPermissionsPanel = ({ role }: Props) => {
-  // console.log('role', role);
-
   return (
     <Paper sx={{ backgroundColor: '#F9FAFA', padding: '10px', marginTop: 1 }}>
       <Typography sx={{ marginBottom: 1 }}>{role.description}</Typography>

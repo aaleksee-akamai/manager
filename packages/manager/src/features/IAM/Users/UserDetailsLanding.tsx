@@ -11,18 +11,18 @@ import { SafeTabPanel } from 'src/components/Tabs/SafeTabPanel';
 import { TabLinkList } from 'src/components/Tabs/TabLinkList';
 import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
-import { useAccountUserPermissions } from 'src/queries/iam/iam';
+// import { useAccountUserPermissions } from 'src/queries/iam/iam';
 
 import { IAM_LABEL } from '../constants';
 import { UserProfile } from './UserDetails/UserProfile';
 import { UserRoles } from './UserRoles/UserRoles';
 import { UserResources } from './UserResources';
 
-// const assignedRoles = {};
+const assignedRoles = {};
 
 export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();
-  const { data: assignedRoles } = useAccountUserPermissions(username ?? '');
+  // const { data: assignedRoles } = useAccountUserPermissions(username ?? '');
 
   const location = useLocation();
   const history = useHistory();
