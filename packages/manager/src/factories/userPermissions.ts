@@ -15,10 +15,15 @@ export const userPermissionsFactory = Factory.Sync.makeFactory<IamUserPermission
         roles: ['linode_contributor'],
       },
       {
-        resource_id: 45678901,
-        resource_type: 'firewall',
-        roles: ['firewall_admin'],
+        resource_id: 23456789,
+        resource_type: 'linode',
+        roles: ['linode_contributor', 'linode_viewer'],
       },
+      // {
+      //   resource_id: 45678901,
+      //   resource_type: 'firewall',
+      //   roles: ['firewall_creator'],
+      // },
     ],
   }
 );

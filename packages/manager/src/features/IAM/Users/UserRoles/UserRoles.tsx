@@ -10,6 +10,7 @@ import { Button, Paper, Typography } from '@linode/ui';
 import { isObjNotEmpty } from '../../Shared/utilities';
 import { NoAssignedRoles } from '../../Shared/NoAssignedRoles/NoAssignedRoles';
 import { NO_ASSIGNED_ROLES_TEXT } from '../../Shared/constants';
+import { AssignedRolesTable } from '../../Shared/AssignedRolesTable/AssignedRolesTable';
 
 interface Props {
   assignedRoles: IamUserPermissions | {};
@@ -25,6 +26,8 @@ export const UserRoles = ({ assignedRoles }: Props) => {
   };
 
   const hasAssignedRoles = isObjNotEmpty(assignedRoles);
+
+  // console.log('assignedRoles', assignedRoles)
 
   return (
     <>
@@ -46,7 +49,9 @@ export const UserRoles = ({ assignedRoles }: Props) => {
           </Button>
         </Grid>
         {!hasAssignedRoles && <NoAssignedRoles text={NO_ASSIGNED_ROLES_TEXT} />}
-        {hasAssignedRoles && <p>you have some roles</p>}
+        {hasAssignedRoles && (
+          <AssignedRolesTable assignedRoles={assignedRoles} />
+        )}
       </Paper>
       <AssignNewRoleDrawer
         onClose={() => setIsDrawerOpen(false)}

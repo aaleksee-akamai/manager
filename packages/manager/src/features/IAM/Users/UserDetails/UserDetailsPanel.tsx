@@ -2,11 +2,8 @@ import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 
 import { DateTimeDisplay } from 'src/components/DateTimeDisplay';
-// import { Paper } from 'src/components/Paper';
-// import { Stack } from 'src/components/Stack';
 import { StatusIcon } from 'src/components/StatusIcon/StatusIcon';
 import { TextTooltip } from 'src/components/TextTooltip';
-// import { Typography } from 'src/components/Typography';
 import { Link } from 'src/components/Link';
 
 import type { User, IamUserPermissions } from '@linode/api-v4';
@@ -121,6 +118,7 @@ export const UserDetailsPanel = ({ user, assignedRoles }: Props) => {
 
 const getAssignRoles = (assign_roles: any): number => {
   const accountAccessRoles = assign_roles.account_access || [];
+  // console.log('details', assign_roles.account_access);
 
   const resourceAccessRoles = assign_roles.resource_access
     ? assign_roles.resource_access.map((resource: any) => resource.roles).flat()

@@ -16,7 +16,11 @@ type AccountAccessType =
   | 'linode_creator'
   | 'firewall_creator';
 
-type RoleType = 'linode_contributor' | 'firewall_admin';
+type RoleType =
+  | 'linode_contributor'
+  | 'firewall_admin'
+  | 'linode_viewer'
+  | 'firewall_creator';
 
 export interface IamUserPermissions {
   account_access: AccountAccessType[];
