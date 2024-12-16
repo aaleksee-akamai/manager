@@ -35,18 +35,31 @@ export const IdentityAccessManagementLanding = React.memo((props: Props) => {
       title: 'Roles',
     },
   ];
+  const matches = (p: string) => {
+    return Boolean(matchPath(p, { path: props.location.pathname }));
+  };
+
+  // const [index, setIndex] = React.useState(() => {
+  //   const foundIndex = tabs.findIndex((tab) => matches(tab.routeName));
+  //   return foundIndex !== -1 ? foundIndex : 0; // Fallback to 0 if not found
+  // });
+
+  const [index, setIndex] = React.useState(
+    tabs.findIndex((tab) => matches(tab.routeName)) || 0
+  );
 
   const navToURL = (index: number) => {
+    setIndex(index);
     props.history.push(tabs[index].routeName);
   };
 
-  const getDefaultTabIndex = () => {
-    const tabChoice = tabs.findIndex((tab) =>
-      Boolean(matchPath(tab.routeName, { path: location.pathname }))
-    );
+  // const getDefaultTabIndex = () => {
+  //   const tabChoice = tabs.findIndex((tab) =>
+  //     Boolean(matchPath(tab.routeName, { path: location.pathname }))
+  //   );
 
-    return tabChoice;
-  };
+  //   return tabChoice;
+  // };
 
   const landingHeaderProps = {
     breadcrumbProps: {
@@ -58,22 +71,22 @@ export const IdentityAccessManagementLanding = React.memo((props: Props) => {
     title: 'Identity and Access',
   };
 
-  let idx = 0;
+  // let idx = 0;
 
   return (
     <>
       <DocumentTitleSegment segment="Identity and Access" />
       <LandingHeader {...landingHeaderProps} />
 
-      <Tabs index={getDefaultTabIndex()} onChange={navToURL}>
+      <Tabs index={index} onChange={navToURL}>
         <TabLinkList tabs={tabs} />
 
         <React.Suspense fallback={<SuspenseLoader />}>
           <TabPanels>
-            <SafeTabPanel index={idx}>
+            <SafeTabPanel index={0}>
               <Users />
             </SafeTabPanel>
-            <SafeTabPanel index={++idx}>
+            <SafeTabPanel index={1}>
               <Roles />
             </SafeTabPanel>
           </TabPanels>

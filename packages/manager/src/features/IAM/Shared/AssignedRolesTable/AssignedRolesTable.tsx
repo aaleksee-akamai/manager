@@ -1,17 +1,21 @@
+/* eslint-disable no-console */
+import { Autocomplete, Button, Chip, Typography } from '@linode/ui';
+import { Grid, styled } from '@mui/material';
 import React from 'react';
 
-import { Autocomplete, Chip, Typography } from '@linode/ui';
+import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { CollapsibleTable } from 'src/components/CollapsibleTable/CollapsibleTable';
-import { TableRowEmpty } from 'src/components/TableRowEmpty/TableRowEmpty';
-import { TableRow } from 'src/components/TableRow';
-import { TableCell } from 'src/components/TableCell';
-import { useAccountPermissions } from 'src/queries/iam/iam';
-import { IamAccountPermissions, IamAccountResource } from '@linode/api-v4';
-import { Permissions } from '../Permissions/Permissions';
-import { Grid, styled } from '@mui/material';
-import { useAccountResources } from 'src/queries/resources/resources';
-import { Action, ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
+import { TableCell } from 'src/components/TableCell';
+import { TableRow } from 'src/components/TableRow';
+import { TableRowEmpty } from 'src/components/TableRowEmpty/TableRowEmpty';
+import { useAccountPermissions } from 'src/queries/iam/iam';
+import { useAccountResources } from 'src/queries/resources/resources';
+
+import { Permissions } from '../Permissions/Permissions';
+
+import type { IamAccountPermissions, IamAccountResource } from '@linode/api-v4';
+import type { Action } from 'src/components/ActionMenu/ActionMenu';
 
 interface Props {
   assignedRoles: any;
@@ -58,13 +62,13 @@ export const AssignedRolesTable = (assignedRoles: Props) => {
   return (
     <Grid>
       <Grid
-        container
-        direction="row"
         sx={{
-          justifyContent: 'flex-start',
           alignItems: 'center',
+          justifyContent: 'flex-start',
           marginBottom: 3,
         }}
+        container
+        direction="row"
       >
         <DebouncedSearchTextField
           clearable
@@ -74,20 +78,20 @@ export const AssignedRolesTable = (assignedRoles: Props) => {
           // isSearching={isSearching}
           onSearch={setQuery}
           placeholder="Search"
+          sx={{ marginRight: 2, width: 320 }}
           value={query}
-          sx={{ width: 320, marginRight: 2 }}
         />
         <Autocomplete
-          label="Select type"
-          onChange={(_, value) => setResourceType(value?.label)}
-          options={resourceTypes}
-          // value={resourceType}
-          placeholder="All Resource Types"
           // getOptionLabel={(option) => option.label || ''}
           textFieldProps={{
             containerProps: { sx: { minWidth: 200 } },
             hideLabel: true,
           }}
+          label="Select type"
+          onChange={(_, value) => setResourceType(value?.label)}
+          options={resourceTypes}
+          // value={resourceType}
+          placeholder="All Resource Types"
         />
       </Grid>
       <CollapsibleTable
@@ -120,9 +124,9 @@ const getTableItems = (
 
   if (resourceType || query) {
     const filteredApps = getFilteredApps({
-      resultArr,
-      resourceType,
       query,
+      resourceType,
+      resultArr,
     });
 
     // console.log('getTableItems filteredApps ', filteredApps)
@@ -198,21 +202,21 @@ const getTableItems = (
     );
 
     const InnerTable = (
-      <>
-        <Grid
-          sx={{
-            paddingLeft: 4,
-            paddingTop: 1,
-            paddingBottom: 2,
-            paddingRight: 3,
-            background: '#F9FAFA',
-          }}
-        >
-          <StyledTypography>Description:</StyledTypography>
-          <Typography sx={{ marginBottom: 1 }}>{role.description}</Typography>
-          <Permissions role={role} />
-        </Grid>
-      </>
+      <Grid
+        sx={{
+          background: '#F9FAFA',
+          paddingBottom: 2,
+          paddingLeft: 4,
+          paddingRight: 3,
+          paddingTop: 1,
+        }}
+      >
+        <StyledTypography>Description:</StyledTypography>
+        {/* <Typography sx={{ marginBottom: 1 }}>{role.description}</Typography> */}
+        <RoleDescription description={role.description} />
+
+        <Permissions permissions={role.permissions} />
+      </Grid>
     );
 
     return {
@@ -225,7 +229,7 @@ const getTableItems = (
 };
 
 const getFilteredApps = (options: any) => {
-  const { resultArr, resourceType, query } = options;
+  const { query, resourceType, resultArr } = options;
   // resultArr,
   // resourceType,
   // query,
@@ -248,6 +252,120 @@ const getFilteredApps = (options: any) => {
 
     return true;
   });
+};
+
+export const StyledButton = styled(Button, { label: 'StyledButton' })(
+  ({ theme }) => ({
+    fontFamily: theme.font.normal,
+    fontSize: '14px',
+    minHeight: '20px',
+    minWidth: '60px',
+    padding: 0,
+  })
+);
+
+interface RoleDescriptionProps {
+  description: string;
+}
+
+const RoleDescription = ({ description }: RoleDescriptionProps) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [visibleChips, setVisibleChips] = React.useState<string[]>([]);
+  const [hiddenChips, setHiddenChips] = React.useState<string[]>([]);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const truncateText = React.useCallback(() => {
+    const container = containerRef.current;
+    if (container) {
+      const lineHeight = parseFloat(
+        getComputedStyle(container).lineHeight || '1.5'
+      );
+      const maxHeight = lineHeight * 2 + 10; // Height of 2 lines
+      console.log('maxHeight', maxHeight);
+      const containerWidth = containerRef.current.offsetWidth - 50; // Leave space for "Show All"
+
+      let accumulatedWidth = 0;
+      const visibleItems: string[] = [];
+      const hiddenItems: string[] = [];
+
+      const arr = description.split(' ');
+      console.log('arr', arr);
+
+      if (container.offsetHeight > maxHeight) {
+        for (const item of arr) {
+          const itemWidth = item.length;
+
+          if (accumulatedWidth + itemWidth + 13 <= containerWidth) {
+            accumulatedWidth += itemWidth + 13;
+            visibleItems.push(item);
+          } else {
+            const lastIdx = arr.indexOf(item);
+            hiddenItems.push(
+              ...arr.slice(lastIdx)
+              // .map()
+            );
+            break;
+          }
+        }
+      }
+
+      if (container.offsetHeight > maxHeight && hiddenItems.length) {
+        visibleItems[visibleItems.length - 1] += '...';
+      }
+
+      setVisibleChips(visibleItems);
+      setHiddenChips(hiddenItems);
+
+      console.log('visibleItems', visibleItems);
+      console.log('hiddenItems', hiddenItems);
+    }
+  }, [description]);
+
+  React.useEffect(() => {
+    truncateText();
+  }, [truncateText]);
+
+  const toggleDescription = () => {
+    setIsExpanded((prev) => !prev);
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}
+    >
+      <Typography
+        sx={{
+          display: 'block',
+          lineHeight: '1.5',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {isExpanded || !visibleChips.join(' ').length
+          ? description
+          : visibleChips.join(' ')}
+      </Typography>
+      {!!hiddenChips.length && (
+        <Button
+          style={{
+            alignSelf: 'flex-end',
+            background: 'none',
+            border: 'none',
+            bottom: '1px',
+            fontSize: '14px',
+            marginTop: '0',
+            minHeight: '20px',
+            padding: '0',
+            position: 'absolute',
+          }}
+          onClick={toggleDescription}
+        >
+          {isExpanded ? 'Hide' : 'Expand'}
+        </Button>
+      )}
+    </div>
+  );
 };
 
 /**
@@ -321,7 +439,7 @@ const combineRoles = (data: {
 
   // Add resource access roles with their respective resource_id
   data.resource_access.forEach(
-    (resource: { roles: any[]; resource_id: any }) => {
+    (resource: { resource_id: any; roles: any[] }) => {
       resource.roles.forEach((role: any) => {
         combinedRoles.push({
           name: role,
@@ -373,21 +491,18 @@ const getResourceTypes = (data: any) => {
   );
   // console.log('getResourceTypes', resourceTypes);
 
-  const r = resourceTypes.map((resource) => ({
+  return resourceTypes.map((resource) => ({
     label: resource,
     value: resource,
   }));
-  // console.log('getResourceTypes r', r);
-
-  return r;
 };
 
 export const StyledTypography = styled(Typography, {
   label: 'StyledTypography',
 })(({ theme }) => ({
   color: '#32363C',
-  fontSize: '14px',
   fontFamily: theme.font.bold,
+  fontSize: '14px',
   marginBottom: 0,
 }));
 
@@ -401,34 +516,34 @@ const mapRolesToPermissions = (
   const roleMap = new Map<
     string,
     {
+      access: string;
+      description: any;
       id: any;
       name: any;
-      description: any;
       permissions: any;
-      resource_type: any;
-      access: string;
       resource_ids: any[];
+      resource_type: any;
     }
   >();
 
   roles.forEach((role: { name: any; resource_id: any }) => {
     const allResources = [
       {
-        type: 'account_access',
         resources: accountPermissions.account_access || [],
+        type: 'account_access',
       },
       {
-        type: 'resource_access',
         resources: accountPermissions.resource_access || [],
+        type: 'resource_access',
       },
     ];
 
-    allResources.forEach(({ type, resources }) => {
-      resources.forEach((resource: { roles: any[]; resource_type: any }) => {
+    allResources.forEach(({ resources, type }) => {
+      resources.forEach((resource: { resource_type: any; roles: any[] }) => {
         resource.roles.forEach(
           (permissionRole: {
-            name: any;
             description: any;
+            name: any;
             permissions: any;
           }) => {
             if (role.name === permissionRole.name) {
@@ -440,13 +555,13 @@ const mapRolesToPermissions = (
                 }
               } else {
                 roleMap.set(role.name, {
+                  access: getAccessType(type),
+                  description: permissionRole.description,
                   id: role.name,
                   name: role.name,
-                  description: permissionRole.description,
                   permissions: permissionRole.permissions,
-                  resource_type: resource.resource_type,
-                  access: getAccessType(type),
                   resource_ids: [role.resource_id],
+                  resource_type: resource.resource_type,
                 });
               }
             }
@@ -461,14 +576,14 @@ const mapRolesToPermissions = (
 
 const addResourceNamesToRoles = (
   roles: Array<{
+    access: string;
+    description: any;
     id: any;
     name: any;
-    description: any;
     permissions: any;
-    resource_type: any;
-    access: string;
     resource_ids: any[];
     resource_names?: string[];
+    resource_type: any;
   }>,
   resources: IamAccountResource | undefined
 ) => {
