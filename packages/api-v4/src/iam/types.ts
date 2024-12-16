@@ -32,7 +32,7 @@ export interface ResourceAccess {
   roles: RoleType[];
 }
 
-type PermissionType =
+export type PermissionType =
   | 'create_linode'
   | 'update_linode'
   | 'update_firewall'
