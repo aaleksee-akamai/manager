@@ -1,8 +1,8 @@
 import { Paper, Typography } from '@linode/ui';
 import * as React from 'react';
 
+import { Entities } from '../Entities/Entities';
 import { Permissions } from '../Permissions/Permissions';
-import { Resources } from '../Resources/Resources';
 
 import type {
   IamAccessType,
@@ -24,7 +24,7 @@ export const AssignedPermissionsPanel = ({ role }: Props) => {
     <Paper sx={{ backgroundColor: '#F9FAFA', marginTop: 1, padding: '10px' }}>
       <Typography sx={{ marginBottom: 1 }}>{role.description}</Typography>
       <Permissions permissions={role.permissions} />
-      <Resources role={role} />
+      <Entities access={role.access} type={role.resource_type} />
     </Paper>
   );
 };

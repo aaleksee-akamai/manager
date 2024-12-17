@@ -1,9 +1,9 @@
 import React from 'react';
 import {
+  matchPath,
   useHistory,
   useLocation,
   useParams,
-  matchPath,
 } from 'react-router-dom';
 
 import { LandingHeader } from 'src/components/LandingHeader';
@@ -13,12 +13,10 @@ import { TabPanels } from 'src/components/Tabs/TabPanels';
 import { Tabs } from 'src/components/Tabs/Tabs';
 import { useAccountUserPermissions } from 'src/queries/iam/iam';
 
-import { UserProfile } from './UserDetails/UserProfile';
-import { UserRoles } from './UserRoles/UserRoles';
 import { IAM_LABEL } from '../Shared/constants';
+import { UserProfile } from './UserDetails/UserProfile';
 import { UserResources } from './UserResources';
-
-// const assignedRoles = {};
+import { UserRoles } from './UserRoles/UserRoles';
 
 export const UserDetailsLanding = () => {
   const { username } = useParams<{ username: string }>();
@@ -47,11 +45,9 @@ export const UserDetailsLanding = () => {
   };
 
   const getDefaultTabIndex = () => {
-    const tabChoice = tabs.findIndex((tab) =>
+    return tabs.findIndex((tab) =>
       Boolean(matchPath(tab.routeName, { path: location.pathname }))
     );
-
-    return tabChoice;
   };
 
   let idx = 0;

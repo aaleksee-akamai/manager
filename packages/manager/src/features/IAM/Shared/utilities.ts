@@ -25,3 +25,17 @@ export const useIsIAMEnabled = () => {
 export const isObjNotEmpty = (obj: any) => {
   return Object.keys(obj).length !== 0;
 };
+
+export const placeholderMap: Record<string, string> = {
+  account: 'Select Account',
+  database: 'Select Databases',
+  domain: 'Select Domains',
+  firewall: 'Select Firewalls',
+  image: 'Select Images',
+  linode: 'Select Linodes',
+  longview: 'Select Longviews',
+  nodebalancer: 'Select Nodebalancers',
+  stackscript: 'Select Stackscripts',
+  volume: 'Select Volumes',
+  vpc: 'Select Vpcs',
+};
