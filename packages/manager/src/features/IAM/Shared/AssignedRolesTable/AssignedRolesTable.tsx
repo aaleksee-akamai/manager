@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
-import { Autocomplete, Button, Chip, Typography } from '@linode/ui';
+import { Autocomplete, Chip, Typography } from '@linode/ui';
 import { Grid, styled } from '@mui/material';
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { CollapsibleTable } from 'src/components/CollapsibleTable/CollapsibleTable';
@@ -9,55 +9,90 @@ import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextFiel
 import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow';
 import { TableRowEmpty } from 'src/components/TableRowEmpty/TableRowEmpty';
-import { useAccountPermissions } from 'src/queries/iam/iam';
+import {
+  useAccountPermissions,
+  useAccountUserPermissions,
+} from 'src/queries/iam/iam';
 import { useAccountResources } from 'src/queries/resources/resources';
+import { capitalize } from 'src/utilities/capitalize';
 
 import { Permissions } from '../Permissions/Permissions';
+import { RoleDescription } from '../RoleDescription/RoleDescription';
 
-import type { IamAccountPermissions, IamAccountResource } from '@linode/api-v4';
+import type {
+  AccountAccessType,
+  IamAccess,
+  IamAccountPermissions,
+  IamAccountResource,
+  IamUserPermissions,
+  PermissionType,
+  ResourceType,
+  ResourceTypePermissions,
+  RoleType,
+  Roles,
+} from '@linode/api-v4';
 import type { Action } from 'src/components/ActionMenu/ActionMenu';
+import type { TableItem } from 'src/components/CollapsibleTable/CollapsibleTable';
 
-interface Props {
-  assignedRoles: any;
+interface RoleMap {
+  access: 'account' | 'resource';
+  description: string;
+  id: AccountAccessType | RoleType;
+  name: AccountAccessType | RoleType;
+  permissions: PermissionType[];
+  resource_ids: null | number[];
+  resource_type: ResourceTypePermissions;
 }
 
-export const AssignedRolesTable = (assignedRoles: Props) => {
-  const { data } = useAccountPermissions();
-  // console.log('data', data);
+interface ResourcesType {
+  label: string;
+  rawValue: ResourceType;
+  value?: string;
+}
+
+interface ExtendedRoleMap extends RoleMap {
+  resource_names?: string[];
+}
+
+interface AllResources {
+  resource: IamAccess;
+  type: 'account' | 'resource';
+}
+
+interface FilteredRolesOptions {
+  query: string;
+  resourceType?: string;
+  roles: RoleMap[];
+}
+
+export const AssignedRolesTable = () => {
+  const { username } = useParams<{ username: string }>();
+
+  const { data: accountPermissions } = useAccountPermissions();
   const { data: resources } = useAccountResources();
-  // console.log('resources', resources, typeof(resources));
+  const { data: assignedRoles } = useAccountUserPermissions(username ?? '');
 
-  // console.log('assignedRoles', assignedRoles)
+  const { resourceTypes, roles } = React.useMemo(() => {
+    if (!assignedRoles || !accountPermissions) {
+      return { resourceTypes: [], roles: [] };
+    }
 
-  // const roles = getAssignRoles(assignedRoles.assignedRoles);
-  // console.log('roles', roles);
-  const arrrr = combineRoles(assignedRoles.assignedRoles);
-  // console.log('arrrr', arrrr);
-
-  // let arr: any;
-  let resultArr: any;
-
-  let resourceTypes: any;
-
-  if (data) {
-    // arr = getRolesByNames(data, roles);
-    // console.log('arr', arr);
-
-    resultArr = mapRolesToPermissions(data, arrrr);
-    // console.log('resultArr', resultArr);
-
-    resourceTypes = getResourceTypes(resultArr);
-    // console.log('resourceTypes', resourceTypes);
+    const userRoles = combineRoles(assignedRoles);
+    let roles = mapRolesToPermissions(accountPermissions, userRoles);
+    const resourceTypes = getResourceTypes(roles);
 
     if (resources) {
-      resultArr = addResourceNamesToRoles(resultArr, resources);
-      // console.log('resultArr resources', resultArr);
+      roles = addResourceNamesToRoles(roles, resources);
     }
-  }
+
+    return { resourceTypes, roles };
+  }, [assignedRoles, accountPermissions, resources]);
 
   const [query, setQuery] = React.useState('');
 
-  const [resourceType, setResourceType] = React.useState<any>();
+  const [resourceType, setResourceType] = React.useState<ResourcesType | null>(
+    null
+  );
 
   return (
     <Grid>
@@ -75,30 +110,28 @@ export const AssignedRolesTable = (assignedRoles: Props) => {
           debounceTime={250}
           hideLabel
           label="Filter"
-          // isSearching={isSearching}
           onSearch={setQuery}
           placeholder="Search"
-          sx={{ marginRight: 2, width: 320 }}
+          sx={{ marginRight: 2, width: 410 }}
           value={query}
         />
         <Autocomplete
-          // getOptionLabel={(option) => option.label || ''}
           textFieldProps={{
-            containerProps: { sx: { minWidth: 200 } },
+            containerProps: { sx: { minWidth: 250 } },
             hideLabel: true,
           }}
           label="Select type"
-          onChange={(_, value) => setResourceType(value?.label)}
+          onChange={(_, selected) => setResourceType(selected ?? null)}
           options={resourceTypes}
-          // value={resourceType}
-          placeholder="All Resource Types"
+          placeholder="All Assigned Roles"
+          value={resourceType}
         />
       </Grid>
       <CollapsibleTable
         TableRowEmpty={
           <TableRowEmpty colSpan={5} message={'No Roles are assigned.'} />
         }
-        TableItems={getTableItems(resultArr, resourceType, query)}
+        TableItems={getTableItems(roles, query, resourceType?.rawValue)}
         TableRowHead={RoleTableRowHead}
       />
     </Grid>
@@ -108,89 +141,84 @@ export const AssignedRolesTable = (assignedRoles: Props) => {
 const RoleTableRowHead = (
   <TableRow>
     <TableCell sx={{ width: '19%' }}>Role</TableCell>
-    <TableCell sx={{ width: '76%' }}>Resources</TableCell>
+    <TableCell sx={{ width: '76%' }}>Entities</TableCell>
     <TableCell sx={{ width: '5%' }} />
   </TableRow>
 );
 
 const getTableItems = (
-  resultArr: any,
-  resourceType?: any,
-  query?: any
-): any[] => {
-  // console.log('result', resultArr);
-  // console.log('getTableItems resourceType', resourceType);
-  // console.log('getTableItems query', query);
-
+  roles: RoleMap[],
+  query: string,
+  resourceType?: string
+): TableItem[] => {
   if (resourceType || query) {
-    const filteredApps = getFilteredApps({
+    const filteredRoles = getFilteredRoles({
       query,
       resourceType,
-      resultArr,
+      roles,
     });
 
-    // console.log('getTableItems filteredApps ', filteredApps)
-
-    resultArr = [...filteredApps];
-
-    // resultArr = resultArr.filter((r: any) => r.resource_type === resourceType);
-    // console.log('resultArr resourceType', resultArr)
+    roles = [...filteredRoles];
   }
 
-  return resultArr.map((role: any) => {
-    const resorces = role.resource_names?.map((r: any, idx: any) => {
-      return <Chip key={idx} label={r} />;
+  return roles.map((role: ExtendedRoleMap) => {
+    const resorces = role.resource_names?.map((name: string) => {
+      return <Chip key={name} label={name} />;
     });
 
     const accountMenu: Action[] = [
       {
         onClick: () => {
-          // history.push(`/iam/users/${username}/roles`);
+          // mock
         },
         title: 'Change Role',
       },
       {
         onClick: () => {
-          // history.push(`/iam/users/${username}/roles`);
+          // mock
         },
-        title: 'Remove Role Assignment ',
+        title: 'Unassign Role',
       },
     ];
 
-    const resourcesMenu: Action[] = [
+    const entitiesMenu: Action[] = [
       {
         onClick: () => {
-          // history.push(`/iam/users/${username}/roles`);
+          // mock
         },
-        title: 'View Resources Details',
+        title: 'View Entities',
       },
       {
         onClick: () => {
-          // history.push(`/iam/users/${username}/roles`);
+          // mock
         },
-        title: 'Update Resource Assignment',
+        title: 'Update List of Entities',
       },
       {
         onClick: () => {
-          // history.push(`/iam/users/${username}/roles`);
+          // mock
         },
-        title: 'Change Role for Resources',
+        title: 'Change Role',
       },
       {
         onClick: () => {
-          // history.push(`/iam/users/${username}/roles`);
+          // mock
         },
-        title: 'Remove Role Assignment ',
+        title: 'Unassign Role',
       },
     ];
 
-    const actions = role.access === 'account' ? accountMenu : resourcesMenu;
+    const actions = role.access === 'account' ? accountMenu : entitiesMenu;
 
     const OuterTableCells = (
       <>
         {role.access === 'account' ? (
           <TableCell>
-            <Typography>All {role.resource_type} resources</Typography>
+            <Typography>
+              {role.resource_type === 'account'
+                ? 'All entities'
+                : `All ${role.resource_type}s`}
+            </Typography>
           </TableCell>
         ) : (
           <TableCell>{resorces}</TableCell>
@@ -205,16 +233,14 @@ const getTableItems = (
       <Grid
         sx={{
           background: '#F9FAFA',
-          paddingBottom: 2,
-          paddingLeft: 4,
-          paddingRight: 3,
-          paddingTop: 1,
+          paddingBottom: 1.5,
+          paddingLeft: 4.5,
+          paddingRight: 4.5,
+          paddingTop: 1.5,
         }}
       >
-        <StyledTypography>Description:</StyledTypography>
-        {/* <Typography sx={{ marginBottom: 1 }}>{role.description}</Typography> */}
+        <StyledTypography variant="body1">Description:</StyledTypography>
         <RoleDescription description={role.description} />
-
         <Permissions permissions={role.permissions} />
       </Grid>
     );
@@ -228,369 +254,169 @@ const getTableItems = (
   });
 };
 
-const getFilteredApps = (options: any) => {
-  const { query, resourceType, resultArr } = options;
-  // resultArr,
-  // resourceType,
-  // query,
+const getFilteredRoles = (options: FilteredRolesOptions) => {
+  const { query, resourceType, roles } = options;
 
-  return resultArr.filter((app: any) => {
+  return roles.filter((role: ExtendedRoleMap) => {
     if (query && resourceType) {
       return (
-        getDoesMarketplaceAppMatchQuery(query, app) &&
-        getDoesMarketplaceAppMatchCategory(resourceType, app)
+        getDoesRolesMatchQuery(query, role) &&
+        getDoesRolesMatchType(resourceType, role)
       );
     }
 
     if (query) {
-      return getDoesMarketplaceAppMatchQuery(query, app);
+      return getDoesRolesMatchQuery(query, role);
     }
 
     if (resourceType) {
-      return getDoesMarketplaceAppMatchCategory(resourceType, app);
+      return getDoesRolesMatchType(resourceType, role);
     }
 
     return true;
   });
 };
 
-export const StyledButton = styled(Button, { label: 'StyledButton' })(
-  ({ theme }) => ({
-    fontFamily: theme.font.normal,
-    fontSize: '14px',
-    minHeight: '20px',
-    minWidth: '60px',
-    padding: 0,
-  })
-);
-
-interface RoleDescriptionProps {
-  description: string;
-}
-
-const RoleDescription = ({ description }: RoleDescriptionProps) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
-  const [visibleChips, setVisibleChips] = React.useState<string[]>([]);
-  const [hiddenChips, setHiddenChips] = React.useState<string[]>([]);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  const truncateText = React.useCallback(() => {
-    const container = containerRef.current;
-    if (container) {
-      const lineHeight = parseFloat(
-        getComputedStyle(container).lineHeight || '1.5'
-      );
-      const maxHeight = lineHeight * 2 + 10; // Height of 2 lines
-      console.log('maxHeight', maxHeight);
-      const containerWidth = containerRef.current.offsetWidth - 50; // Leave space for "Show All"
-
-      let accumulatedWidth = 0;
-      const visibleItems: string[] = [];
-      const hiddenItems: string[] = [];
-
-      const arr = description.split(' ');
-      console.log('arr', arr);
-
-      if (container.offsetHeight > maxHeight) {
-        for (const item of arr) {
-          const itemWidth = item.length;
-
-          if (accumulatedWidth + itemWidth + 13 <= containerWidth) {
-            accumulatedWidth += itemWidth + 13;
-            visibleItems.push(item);
-          } else {
-            const lastIdx = arr.indexOf(item);
-            hiddenItems.push(
-              ...arr.slice(lastIdx)
-              // .map()
-            );
-            break;
-          }
-        }
-      }
-
-      if (container.offsetHeight > maxHeight && hiddenItems.length) {
-        visibleItems[visibleItems.length - 1] += '...';
-      }
-
-      setVisibleChips(visibleItems);
-      setHiddenChips(hiddenItems);
-
-      console.log('visibleItems', visibleItems);
-      console.log('hiddenItems', hiddenItems);
-    }
-  }, [description]);
-
-  React.useEffect(() => {
-    truncateText();
-  }, [truncateText]);
-
-  const toggleDescription = () => {
-    setIsExpanded((prev) => !prev);
-  };
-
-  return (
-    <div
-      ref={containerRef}
-      style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}
-    >
-      <Typography
-        sx={{
-          display: 'block',
-          lineHeight: '1.5',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {isExpanded || !visibleChips.join(' ').length
-          ? description
-          : visibleChips.join(' ')}
-      </Typography>
-      {!!hiddenChips.length && (
-        <Button
-          style={{
-            alignSelf: 'flex-end',
-            background: 'none',
-            border: 'none',
-            bottom: '1px',
-            fontSize: '14px',
-            marginTop: '0',
-            minHeight: '20px',
-            padding: '0',
-            position: 'absolute',
-          }}
-          onClick={toggleDescription}
-        >
-          {isExpanded ? 'Hide' : 'Expand'}
-        </Button>
-      )}
-    </div>
-  );
-};
-
 /**
- * Checks if the given StackScript has a category
+ * Checks if the given Role has a type
  *
- * @param resourceType The category to check for
- * @param app The Marketplace app to compare against
- * @returns true if the given app has the given category
+ * @param resourceType The type to check for
+ * @param role The role to compare against
+ * @returns true if the given role has the given type
  */
-const getDoesMarketplaceAppMatchCategory = (resourceType: any, app: any) => {
-  return app.resource_type === resourceType;
+const getDoesRolesMatchType = (resourceType: string, role: ExtendedRoleMap) => {
+  return role.resource_type === resourceType;
 };
 
 /**
- * Compares a StackScript's details to a given text search query
+ * Compares a Role details to a given text search query
  *
  * @param query the current search query
- * @param stackscript the StackScript to compare aginst
- * @returns true if the StackScript matches the given query
+ * @param role the Role to compare aginst
+ * @returns true if the Role matches the given query
  */
-const getDoesMarketplaceAppMatchQuery = (query: string, app: any) => {
+const getDoesRolesMatchQuery = (query: string, role: ExtendedRoleMap) => {
   const queryWords = query
     .replace(/[,.-]/g, '')
     .trim()
     .toLocaleLowerCase()
     .split(' ');
+  const resourceNames = role.resource_names || [];
 
-  const searchableAppFields = [
-    String(app.id),
-    app.resource_type,
-    app.name,
-    app.access,
-    app.description,
-    // app.resource_names,
-    ...app.permissions,
+  const searchableFields = [
+    String(role.id),
+    role.resource_type,
+    role.name,
+    role.access,
+    role.description,
+    ...resourceNames,
+    ...role.permissions,
   ];
 
-  return searchableAppFields.some((field) =>
+  return searchableFields.some((field) =>
     queryWords.some((queryWord) => field.toLowerCase().includes(queryWord))
   );
 };
 
-// const getAssignRoles = (assign_roles: any): any => {
-//   const accountAccessRoles = assign_roles.account_access || [];
-//   console.log('table', assign_roles.account_access)
-
-//   const resourceAccessRoles = assign_roles.resource_access
-//     ? assign_roles.resource_access.map((resource: any) => resource.roles).flat()
-//     : [];
-
-//   const combinedRoles = Array.from(
-//     new Set(accountAccessRoles.concat(resourceAccessRoles))
-//   );
-
-//   return combinedRoles;
-// };
-
-const combineRoles = (data: {
-  account_access: any[];
-  resource_access: any[];
-}) => {
-  const combinedRoles: { name: any; resource_id: any }[] = [];
+/**
+ * Group account_access and resource_access roles of the user
+ *
+ */
+const combineRoles = (data: IamUserPermissions) => {
+  const combinedRoles: {
+    id: null | number[];
+    name: AccountAccessType | RoleType;
+  }[] = [];
+  const roleMap: Map<AccountAccessType | RoleType, null | number[]> = new Map();
 
   // Add account access roles with resource_id set to null
-  data.account_access.forEach((role: any) => {
-    combinedRoles.push({
-      name: role,
-      resource_id: null,
-    });
+  data.account_access.forEach((role: AccountAccessType) => {
+    if (!roleMap.has(role)) {
+      roleMap.set(role, null);
+    }
   });
 
   // Add resource access roles with their respective resource_id
   data.resource_access.forEach(
-    (resource: { resource_id: any; roles: any[] }) => {
-      resource.roles.forEach((role: any) => {
-        combinedRoles.push({
-          name: role,
-          resource_id: resource.resource_id,
-        });
+    (resource: { resource_id: number; roles: RoleType[] }) => {
+      resource.roles?.forEach((role: RoleType) => {
+        if (roleMap.has(role)) {
+          const existingResourceIds = roleMap.get(role);
+          if (existingResourceIds && existingResourceIds !== null) {
+            roleMap.set(role, [...existingResourceIds, resource.resource_id]);
+          }
+        } else {
+          roleMap.set(role, [resource.resource_id]);
+        }
       });
     }
   );
+
+  // Convert the Map into the final combinedRoles array
+  roleMap.forEach((id, name) => {
+    combinedRoles.push({ id, name });
+  });
 
   return combinedRoles;
 };
 
-// const getRolesByNames = (
-//   accountPermissions: IamAccountPermissions,
-//   roles: string[] // Array of role names
-// ): Array<{ name: string; description: string; permissions: string[]; resource_type: string; access: string }> => {
-//   const accessTypes: IamAccessType[] = ['account_access', 'resource_access'];
-//   const result: Array<{ id: string; name: string; description: string; permissions: string[]; resource_type: string; access: string }> = [];
-
-//   for (const roleName of roles) {
-//     for (const permissionType of accessTypes) {
-//       const resources = accountPermissions[permissionType];
-//       for (const resource of resources) {
-//         const role = resource.roles.find((role: Roles) => role.name === roleName);
-//         if (role && !result.find(item => item.name === roleName)) { // Ensure no duplicates
-//           // console.log('item', item)
-
-//           result.push({
-//             id: role.name,
-//             name: role.name,
-//             description: role.description,
-//             permissions: role.permissions,
-//             resource_type: resource.resource_type,
-//             access: permissionType, // Include access type (account or resource),
-//             // resource_id:
-//           });
-//         }
-//       }
-//     }
-//   }
-
-//   return result; // Return an array of objects
-// };
-
-const getResourceTypes = (data: any) => {
-  // console.log('data', data);
-  const resourceTypes = Array.from(
-    new Set(data.map((el: any) => el.resource_type))
-  );
-  // console.log('getResourceTypes', resourceTypes);
-
-  return resourceTypes.map((resource) => ({
-    label: resource,
-    value: resource,
-  }));
-};
-
-export const StyledTypography = styled(Typography, {
-  label: 'StyledTypography',
-})(({ theme }) => ({
-  color: '#32363C',
-  fontFamily: theme.font.bold,
-  fontSize: '14px',
-  marginBottom: 0,
-}));
-
+/**
+ * Add descriptions, permissions, type to roles
+ */
 const mapRolesToPermissions = (
   accountPermissions: IamAccountPermissions,
-  roles: any[]
+  userRoles: {
+    id: null | number[];
+    name: AccountAccessType | RoleType;
+  }[]
 ) => {
-  const getAccessType = (accessType: string) =>
-    accessType === 'account_access' ? 'account' : 'resource';
+  const roleMap = new Map<string, RoleMap>();
 
-  const roleMap = new Map<
-    string,
-    {
-      access: string;
-      description: any;
-      id: any;
-      name: any;
-      permissions: any;
-      resource_ids: any[];
-      resource_type: any;
-    }
-  >();
+  // Flatten resources and map roles for quick lookup
+  const allResources11: AllResources[] = [
+    ...accountPermissions.account_access.map((resource) => ({
+      resource,
+      type: 'account' as const,
+    })),
+    ...accountPermissions.resource_access.map((resource) => ({
+      resource,
+      type: 'resource' as const,
+    })),
+  ];
 
-  roles.forEach((role: { name: any; resource_id: any }) => {
-    const allResources = [
-      {
-        resources: accountPermissions.account_access || [],
-        type: 'account_access',
-      },
-      {
-        resources: accountPermissions.resource_access || [],
-        type: 'resource_access',
-      },
-    ];
-
-    allResources.forEach(({ resources, type }) => {
-      resources.forEach((resource: { resource_type: any; roles: any[] }) => {
-        resource.roles.forEach(
-          (permissionRole: {
-            description: any;
-            name: any;
-            permissions: any;
-          }) => {
-            if (role.name === permissionRole.name) {
-              const existingEntry = roleMap.get(role.name);
-
-              if (existingEntry) {
-                if (!existingEntry.resource_ids.includes(role.resource_id)) {
-                  existingEntry.resource_ids.push(role.resource_id);
-                }
-              } else {
-                roleMap.set(role.name, {
-                  access: getAccessType(type),
-                  description: permissionRole.description,
-                  id: role.name,
-                  name: role.name,
-                  permissions: permissionRole.permissions,
-                  resource_ids: [role.resource_id],
-                  resource_type: resource.resource_type,
-                });
-              }
-            }
-          }
-        );
-      });
+  const roleLookup = new Map<string, AllResources>();
+  allResources11.forEach(({ resource, type }) => {
+    resource.roles.forEach((role: Roles) => {
+      roleLookup.set(role.name, { resource, type });
     });
+  });
+
+  // Map userRoles to permissions
+  userRoles.forEach(({ id, name }) => {
+    const match = roleLookup.get(name);
+    if (match) {
+      const { resource, type } = match;
+      const role = resource.roles.find((role: Roles) => role.name === name)!;
+      roleMap.set(name, {
+        access: type,
+        description: role.description,
+        id: name,
+        name,
+        permissions: role.permissions,
+        resource_ids: id,
+        resource_type: resource.resource_type,
+      });
+    }
   });
 
   return Array.from(roleMap.values());
 };
 
 const addResourceNamesToRoles = (
-  roles: Array<{
-    access: string;
-    description: any;
-    id: any;
-    name: any;
-    permissions: any;
-    resource_ids: any[];
-    resource_names?: string[];
-    resource_type: any;
-  }>,
-  resources: IamAccountResource | undefined
+  roles: ExtendedRoleMap[],
+  resources: IamAccountResource
 ) => {
-  // Safely convert resources to an array
-  const resourcesArray: IamAccountResource[] = resources
-    ? Object.values(resources)
-    : [];
+  const resourcesArray: IamAccountResource[] = Object.values(resources);
 
   return roles.map((role) => {
     // Find the resource group by resource_type
@@ -598,14 +424,14 @@ const addResourceNamesToRoles = (
       (res) => res.resource_type === role.resource_type
     );
 
-    if (resourceGroup) {
+    if (resourceGroup && role.resource_ids) {
       // Map resource_ids to their names
       const resourceNames = role.resource_ids
         .map(
           (id) =>
             resourceGroup.resources.find((resource) => resource.id === id)?.name
         )
-        .filter((name): name is string => name !== undefined);
+        .filter((name): name is string => name !== undefined); // Remove undefined values
 
       return { ...role, resource_names: resourceNames };
     }
@@ -614,3 +440,26 @@ const addResourceNamesToRoles = (
     return { ...role, resource_names: [] };
   });
 };
+
+const getResourceTypes = (data: RoleMap[]) => {
+  const resourceTypes = Array.from(
+    new Set(data.map((el: RoleMap) => el.resource_type))
+  );
+
+  return resourceTypes.map((resource: ResourceType) => ({
+    label: capitalize(resource) + ` Roles`,
+    rawValue: resource,
+    value: capitalize(resource) + ` Roles`,
+  }));
+};
+
+export const StyledTypography = styled(Typography, {
+  label: 'StyledTypography',
+})(({ theme }) => ({
+  color:
+    theme.name === 'light'
+      ? theme.tokens.color.Neutrals[90]
+      : theme.tokens.color.Neutrals.Black,
+  fontFamily: theme.font.bold,
+  marginBottom: 0,
+}));

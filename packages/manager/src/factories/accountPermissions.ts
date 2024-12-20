@@ -1,5 +1,6 @@
-import { IamAccountPermissions } from '@linode/api-v4';
 import Factory from 'src/factories/factoryProxy';
+
+import type { IamAccountPermissions } from '@linode/api-v4';
 
 export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPermissions>(
   {
@@ -8,8 +9,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'account',
         roles: [
           {
-            name: 'account_viewer',
             description: 'Access to view all resources in the account',
+            name: 'account_viewer',
             permissions: [
               'view_account',
               'view_account_settings',
@@ -62,9 +63,9 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'account_admin',
             description:
               'Access to perform any supported action on all resources in the account',
+            name: 'account_admin',
             permissions: [
               'view_account',
               'view_account_settings',
@@ -210,14 +211,14 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'account_retail_owner',
             description:
               'Access to perform any supported action on all linode instances in the account',
+            name: 'account_retail_owner',
             permissions: ['cancel_account'],
           },
           {
-            name: 'billing_viewer',
             description: 'Access to view bills, payments in the account',
+            name: 'billing_viewer',
             permissions: [
               'list_payments',
               'list_invoices',
@@ -229,9 +230,9 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'billing_admin',
             description:
               'Access to view bills, and make payments in the account',
+            name: 'billing_admin',
             permissions: [
               'list_payments',
               'list_invoices',
@@ -253,8 +254,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'linode',
         roles: [
           {
-            name: 'linode_creator',
             description: 'Access to create a linode instance',
+            name: 'linode_creator',
             permissions: [
               'create_linode',
               'list_linodes',
@@ -267,9 +268,9 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'account_linode_admin',
             description:
               '1 Access to administer all linode instances. 2 Access to administer all linode instances. 3 Access to administer all linode instances. 4 Access to administer all linode instances. 5 Access to administer all linode instances. 6 Access to administer all linode instances. 7 Access to administer all linode instances. 8 Access to administer all linode instances. 9 Access to administer all linode instances. 10 Access to administer all linode instances. 11 Access to administer all linode instances. 12 Access to administer all linode instances. 13 Access to administer all linode instances. 14 Access to administer all linode instances. 15 Access to administer all linode instances.',
+            name: 'account_linode_admin',
             permissions: [
               'create_linode',
               'list_linodes',
@@ -340,13 +341,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'firewall',
         roles: [
           {
-            name: 'firewall_creator',
             description: 'Access to create a firewall instance',
+            name: 'firewall_creator',
             permissions: ['create_firewall', 'list_firewalls'],
           },
           {
-            name: 'account_firewall_admin',
             description: 'Access to administer all firewall instances',
+            name: 'account_firewall_admin',
             permissions: [
               'create_firewall',
               'list_firewalls',
@@ -366,13 +367,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'image',
         roles: [
           {
-            name: 'image_creator',
             description: 'Access to create a image instance',
+            name: 'image_creator',
             permissions: ['create_image', 'upload_image', 'list_images'],
           },
           {
-            name: 'account_image_admin',
             description: 'Access to administer all image instances',
+            name: 'account_image_admin',
             permissions: [
               'create_image',
               'upload_image',
@@ -388,8 +389,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'vpc',
         roles: [
           {
-            name: 'vpc_creator',
             description: 'Access to create a vpc instance',
+            name: 'vpc_creator',
             permissions: [
               'create_vpc',
               'list_vpcs',
@@ -397,8 +398,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'account_vpc_admin',
             description: 'Access to administer all vpc instances',
+            name: 'account_vpc_admin',
             permissions: [
               'create_vpc',
               'list_vpcs',
@@ -420,13 +421,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'volume',
         roles: [
           {
-            name: 'volume_creator',
             description: 'Access to create a volume instance',
+            name: 'volume_creator',
             permissions: ['create_volume', 'list_volumes'],
           },
           {
-            name: 'account_volume_admin',
             description: 'Access to administer all volume instances',
+            name: 'account_volume_admin',
             permissions: [
               'create_volume',
               'list_volumes',
@@ -445,13 +446,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'nodebalancer',
         roles: [
           {
-            name: 'nodebalancer_creator',
             description: 'Access to create a nodebalancer instance',
+            name: 'nodebalancer_creator',
             permissions: ['create_nodebalancer', 'list_nodebalancers'],
           },
           {
-            name: 'account_nodebalancer_admin',
             description: 'Access to administer all nodebalancer instances',
+            name: 'account_nodebalancer_admin',
             permissions: [
               'create_nodebalancer',
               'list_nodebalancers',
@@ -481,8 +482,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'linode',
         roles: [
           {
-            name: 'linode_admin',
             description: 'Access to administer a linode instance',
+            name: 'linode_admin',
             permissions: [
               'create_linode',
               'list_linodes',
@@ -548,8 +549,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'linode_viewer',
             description: 'Access to view a linode instance',
+            name: 'linode_viewer',
             permissions: [
               'view_linode',
               'view_linode_stats',
@@ -576,8 +577,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'linode_contributor',
             description: 'Access to view a linode instance',
+            name: 'linode_contributor',
             permissions: [
               'view_linode',
               'view_linode_stats',
@@ -635,8 +636,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'image',
         roles: [
           {
-            name: 'image_admin',
             description: 'Access to administer a image instance',
+            name: 'image_admin',
             permissions: [
               'create_image',
               'upload_image',
@@ -647,13 +648,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'image_viewer',
             description: 'Access to view an image instance',
+            name: 'image_viewer',
             permissions: ['view_image'],
           },
           {
-            name: 'image_contributor',
             description: 'Access to update an image instance',
+            name: 'image_contributor',
             permissions: ['view_image', 'update_image'],
           },
         ],
@@ -662,8 +663,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'vpc',
         roles: [
           {
-            name: 'vpc_admin',
             description: 'Access to administer a vpc instance',
+            name: 'vpc_admin',
             permissions: [
               'create_vpc',
               'list_vpcs',
@@ -680,8 +681,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'vpc_viewer',
             description: 'Access to view a vpc instance',
+            name: 'vpc_viewer',
             permissions: [
               'view_vpc',
               'list_vpc_ip_addresses',
@@ -690,8 +691,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'vpc_contributor',
             description: 'Access to update a vpc instance',
+            name: 'vpc_contributor',
             permissions: [
               'view_vpc',
               'list_vpc_ip_addresses',
@@ -710,8 +711,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'volume',
         roles: [
           {
-            name: 'volume_admin',
             description: 'Access to administer a volume instance',
+            name: 'volume_admin',
             permissions: [
               'view_volume',
               'update_volume',
@@ -723,13 +724,13 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'volume_viewer',
             description: 'Access to view a volume instance',
+            name: 'volume_viewer',
             permissions: ['view_volume'],
           },
           {
-            name: 'volume_contributor',
             description: 'Access to update a volume instance',
+            name: 'volume_contributor',
             permissions: [
               'view_volume',
               'update_volume',
@@ -745,8 +746,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
         resource_type: 'nodebalancer',
         roles: [
           {
-            name: 'nodebalancer_admin',
             description: 'Access to administer a nodebalancer instance',
+            name: 'nodebalancer_admin',
             permissions: [
               'view_nodebalancer',
               'list_nodebalancer_firewalls',
@@ -767,8 +768,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'nodebalancer_viewer',
             description: 'Access to view a nodebalancer instance',
+            name: 'nodebalancer_viewer',
             permissions: [
               'view_nodebalancer',
               'list_nodebalancer_firewalls',
@@ -780,8 +781,8 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
             ],
           },
           {
-            name: 'nodebalancer_contributor',
             description: 'Access to update a nodebalancer instance',
+            name: 'nodebalancer_contributor',
             permissions: [
               'view_nodebalancer',
               'list_nodebalancer_firewalls',

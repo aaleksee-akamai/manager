@@ -51,7 +51,7 @@ export const Permissions = ({ permissions }: Props) => {
         const chipLeft = (item as HTMLElement).offsetLeft;
 
         // The distance between the parent container and the beginning of the child on the left side
-        const leftCoordinateStartRow = isSmallContainer ? 42 : 32;
+        const leftCoordinateStartRow = isSmallContainer ? 42 : 36;
 
         // Find items that are located near the left side of the container
         if (chipLeft === leftCoordinateStartRow) {

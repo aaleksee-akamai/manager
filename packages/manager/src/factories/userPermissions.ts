@@ -1,5 +1,6 @@
-import { IamUserPermissions } from '@linode/api-v4';
 import Factory from 'src/factories/factoryProxy';
+
+import type { IamUserPermissions } from '@linode/api-v4';
 
 export const userPermissionsFactory = Factory.Sync.makeFactory<IamUserPermissions>(
   {
@@ -7,6 +8,7 @@ export const userPermissionsFactory = Factory.Sync.makeFactory<IamUserPermission
       'account_linode_admin',
       'linode_creator',
       'firewall_creator',
+      'account_viewer',
     ],
     resource_access: [
       {

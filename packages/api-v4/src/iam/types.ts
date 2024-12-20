@@ -11,12 +11,13 @@ export type ResourceTypePermissions =
   | 'account'
   | 'vpc';
 
-type AccountAccessType =
+export type AccountAccessType =
   | 'account_linode_admin'
   | 'linode_creator'
-  | 'firewall_creator';
+  | 'firewall_creator'
+  | 'account_viewer';
 
-type RoleType =
+export type RoleType =
   | 'linode_contributor'
   | 'firewall_admin'
   | 'linode_viewer'
@@ -66,7 +67,6 @@ export type PermissionType =
   | 'view_linode_networking_info'
   | 'list_linode_nodebalancers'
   | 'list_linode_kernels'
-  | 'view_linode_type'
   | 'view_linode_backup'
   | 'view_linode_config_profile'
   | 'list_linode_config_profile_interfaces'
@@ -107,7 +107,6 @@ export type PermissionType =
   | 'assign_ipv4'
   | 'share_ipv4'
   | 'create_ipv6_range'
-  | 'view_linode_type'
   | 'boot_linode'
   | 'clone_linode'
   | 'migrate_linode'

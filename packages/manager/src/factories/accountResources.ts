@@ -1,5 +1,6 @@
-import { IamAccountResource } from '@linode/api-v4';
 import Factory from 'src/factories/factoryProxy';
+
+import type { IamAccountResource } from '@linode/api-v4';
 
 export const accountResourcesFactory = Factory.Sync.makeFactory<
   IamAccountResource[]
@@ -8,12 +9,12 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'linode',
     resources: [
       {
-        name: 'debian-us-123',
         id: 12345678,
+        name: 'debian-us-123',
       },
       {
-        name: 'linode-uk-123',
         id: 23456789,
+        name: 'linode-uk-123',
       },
     ],
   },
@@ -21,8 +22,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'firewall',
     resources: [
       {
-        name: 'firewall-us-123',
         id: 45678901,
+        name: 'firewall-us-123',
       },
     ],
   },
@@ -30,8 +31,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'image',
     resources: [
       {
-        name: 'image-us-123',
         id: 65789745,
+        name: 'image-us-123',
       },
     ],
   },
@@ -39,8 +40,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'vpc',
     resources: [
       {
-        name: 'vpc-us-123',
         id: 7654321,
+        name: 'vpc-us-123',
       },
     ],
   },
@@ -48,8 +49,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'volume',
     resources: [
       {
-        name: 'volume-us-123',
         id: 890357,
+        name: 'volume-us-123',
       },
     ],
   },
@@ -57,8 +58,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'nodebalancer',
     resources: [
       {
-        name: 'nodebalancer-us-123',
         id: 4532187,
+        name: 'nodebalancer-us-123',
       },
     ],
   },
@@ -66,8 +67,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'longview',
     resources: [
       {
-        name: 'longview-us-123',
         id: 432178973,
+        name: 'longview-us-123',
       },
     ],
   },
@@ -75,8 +76,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'domain',
     resources: [
       {
-        name: 'domain-us-123',
         id: 5437894,
+        name: 'domain-us-123',
       },
     ],
   },
@@ -84,8 +85,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'stackscript',
     resources: [
       {
-        name: 'stackscript-us-123',
         id: 654321789,
+        name: 'stackscript-us-123',
       },
     ],
   },
@@ -93,8 +94,8 @@ export const accountResourcesFactory = Factory.Sync.makeFactory<
     resource_type: 'database',
     resources: [
       {
-        name: 'database-us-123',
         id: 643218965,
+        name: 'database-us-123',
       },
     ],
   },
