@@ -26,7 +26,7 @@ export const accountPermissionsFactory = Factory.Sync.makeFactory<IamAccountPerm
           },
           {
             description:
-              'Access to perform any supported action on all linode instances in the account',
+              'Access to perform any supported action on all linode instances in the account. Access to perform any supported action on all linode instances in the account. Access to perform any supported action on all linode instances in the account. Access to perform any supported action on all linode instances in the account. Access to perform any supported action on all linode instances in the account',
             name: 'account_linode_admin',
             permissions: ['create_linode', 'update_linode', 'delete_linode'],
           },

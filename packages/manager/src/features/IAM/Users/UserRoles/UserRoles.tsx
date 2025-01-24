@@ -24,7 +24,7 @@ export const UserRoles = () => {
   return (
     <>
       <DocumentTitleSegment segment={`${username} - User Roles`} />
-      <Paper>
+      <Paper sx={(theme) => ({ marginTop: theme.spacing(2) })}>
         <Stack spacing={3}>
           <Stack
             alignItems="center"

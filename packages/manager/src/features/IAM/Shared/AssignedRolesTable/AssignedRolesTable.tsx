@@ -1,4 +1,10 @@
-import { Autocomplete, Chip, CircleProgress, Typography } from '@linode/ui';
+import {
+  Autocomplete,
+  Chip,
+  CircleProgress,
+  StyledLinkButton,
+  Typography,
+} from '@linode/ui';
 import { Grid, styled } from '@mui/material';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -14,29 +20,22 @@ import {
   useAccountUserPermissions,
 } from 'src/queries/iam/iam';
 import { useAccountResources } from 'src/queries/resources/resources';
-import { capitalize } from 'src/utilities/capitalize';
+import { truncate } from 'src/utilities/truncate';
 
-import { getFilteredRoles } from '../utilities';
+import { getFilteredRoles, getResourceOrEntityTypes } from '../utilities';
 
-import type { ExtendedRoleMap, RoleMap } from '../utilities';
+import type { EntitiesType, ExtendedRoleMap, RoleMap } from '../utilities';
 import type {
   AccountAccessType,
   IamAccess,
   IamAccountPermissions,
   IamAccountResource,
   IamUserPermissions,
-  ResourceType,
   RoleType,
   Roles,
 } from '@linode/api-v4';
 import type { Action } from 'src/components/ActionMenu/ActionMenu';
 import type { TableItem } from 'src/components/CollapsibleTable/CollapsibleTable';
-
-interface ResourcesType {
-  label: string;
-  rawValue: ResourceType;
-  value?: string;
-}
 
 interface AllResources {
   resource: IamAccess;
@@ -82,16 +81,19 @@ export const AssignedRolesTable = () => {
 
   const [query, setQuery] = React.useState('');
 
-  const [resourceType, setResourceType] = React.useState<ResourcesType | null>(
-    null
-  );
+  const [entityType, setEntityType] = React.useState<EntitiesType | null>(null);
+
+  const [showFullDescription, setShowFullDescription] = React.useState(false);
 
   const memoizedTableItems: TableItem[] = React.useMemo(() => {
-    const filteredRoles = getFilteredRoles({
-      query,
-      resourceType: resourceType?.rawValue,
-      roles,
-    });
+    const filteredRoles = getFilteredRoles(
+      {
+        entityType: entityType?.rawValue,
+        query,
+        roles,
+      },
+      getSearchableFields
+    );
 
     return filteredRoles.map((role: ExtendedRoleMap) => {
       const resources = role.resource_names?.map((name: string) => (
@@ -142,6 +144,11 @@ export const AssignedRolesTable = () => {
 
       const actions = role.access === 'account' ? accountMenu : entitiesMenu;
 
+      const description =
+        role.description.length < 150 || showFullDescription
+          ? role.description
+          : truncate(role.description, 150);
+
       const OuterTableCells = (
         <>
           {role.access === 'account' ? (
@@ -172,7 +179,19 @@ export const AssignedRolesTable = () => {
           })}
         >
           <StyledTypography variant="body1">Description:</StyledTypography>
-          <Typography>{role.description}</Typography>
+          {/* <Typography>{role.description}</Typography> */}
+          {/* <Typography>{description}</Typography> */}
+          <Typography sx={{ overflowWrap: 'anywhere', wordBreak: 'normal' }}>
+            {description}{' '}
+            {description.length > 150 && (
+              <StyledLinkButton
+                onClick={() => setShowFullDescription((show) => !show)}
+                sx={{ fontSize: '0.875rem' }}
+              >
+                Read {showFullDescription ? 'Less' : 'More'}
+              </StyledLinkButton>
+            )}
+          </Typography>
         </Grid>
       );
 
@@ -183,7 +202,7 @@ export const AssignedRolesTable = () => {
         label: role.name,
       };
     });
-  }, [roles, query, resourceType]);
+  }, [roles, query, entityType, showFullDescription]);
 
   if (accountPermissionsLoading || resourcesLoading || assignedRolesLoading) {
     return <CircleProgress />;
@@ -216,10 +235,10 @@ export const AssignedRolesTable = () => {
             hideLabel: true,
           }}
           label="Select type"
-          onChange={(_, selected) => setResourceType(selected ?? null)}
+          onChange={(_, selected) => setEntityType(selected ?? null)}
           options={resourceTypes}
           placeholder="All Assigned Roles"
-          value={resourceType}
+          value={entityType}
         />
       </Grid>
       <CollapsibleTable
@@ -361,17 +380,8 @@ const addResourceNamesToRoles = (
   });
 };
 
-const getResourceTypes = (data: RoleMap[]): ResourcesType[] => {
-  const resourceTypes = Array.from(
-    new Set(data.map((el: RoleMap) => el.resource_type))
-  );
-
-  return resourceTypes.map((resource: ResourceType) => ({
-    label: capitalize(resource) + ` Roles`,
-    rawValue: resource,
-    value: capitalize(resource) + ` Roles`,
-  }));
-};
+const getResourceTypes = (data: RoleMap[]): EntitiesType[] =>
+  getResourceOrEntityTypes(data, ' Roles');
 
 export const StyledTypography = styled(Typography, {
   label: 'StyledTypography',
@@ -383,3 +393,17 @@ export const StyledTypography = styled(Typography, {
   fontFamily: theme.font.bold,
   marginBottom: 0,
 }));
+
+const getSearchableFields = (role: ExtendedRoleMap): string[] => {
+  const resourceNames = role.resource_names || [];
+
+  return [
+    String(role.id),
+    role.resource_type,
+    role.name,
+    role.access,
+    role.description,
+    ...resourceNames,
+    ...role.permissions,
+  ];
+};
