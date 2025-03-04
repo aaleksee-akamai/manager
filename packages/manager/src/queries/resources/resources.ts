@@ -7,7 +7,7 @@ import { resourcesQueries } from './queries';
 export const useAccountResources = () => {
   const { data: profile } = useProfile();
 
-  return useQuery<IamAccountResource, APIError[]>({
+  return useQuery<IamAccountResource[], APIError[]>({
     ...resourcesQueries.resources,
     ...queryPresets.oneTimeFetch,
     ...queryPresets.noRetry,

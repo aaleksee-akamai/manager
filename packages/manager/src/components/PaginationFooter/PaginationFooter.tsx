@@ -8,7 +8,8 @@ import { PaginationControls } from '../PaginationControls/PaginationControls';
 
 import type { SxProps } from '@mui/material/styles';
 
-export const MIN_PAGE_SIZE = 25;
+// export const MIN_PAGE_SIZE = 25;
+export const MIN_PAGE_SIZE = 3;
 
 export interface PaginationProps {
   count: number;

@@ -6,7 +6,12 @@ import { accountResourcesFactory } from 'src/factories/accountResources';
 import { userPermissionsFactory } from 'src/factories/userPermissions';
 import { renderWithTheme } from 'src/utilities/testHelpers';
 
-import { AssignedRolesTable } from './AssignedRolesTable';
+import {
+  addResourceNamesToRoles,
+  AssignedRolesTable,
+} from './AssignedRolesTable';
+import { IamAccountResource } from '@linode/api-v4';
+import { ExtendedRoleMap } from '../utilities';
 
 const queryMocks = vi.hoisted(() => ({
   useAccountPermissions: vi.fn().mockReturnValue({}),
@@ -145,5 +150,101 @@ describe('AssignedRolesTable', () => {
     await waitFor(() => {
       expect(queryByText('firewall_creator')).toBeInTheDocument();
     });
+  });
+});
+
+const accountResources: IamAccountResource[] = [
+  {
+    resource_type: 'linode',
+    resources: [
+      {
+        id: 12345678,
+        name: 'debian-us-123',
+      },
+    ],
+  },
+  {
+    resource_type: 'firewall',
+    resources: [
+      {
+        id: 45678901,
+        name: 'firewall-us-123',
+      },
+    ],
+  },
+];
+
+describe('addResourceNamesToRoles', () => {
+  it('should return an object of users roles', () => {
+    const userRoles: ExtendedRoleMap[] = [
+      {
+        access: 'account',
+        description:
+          'Access to perform any supported action on all resources in the account',
+        id: 'account_admin',
+        name: 'account_admin',
+        permissions: ['create_linode', 'update_linode', 'update_firewall'],
+        resource_ids: null,
+        resource_type: 'account',
+      },
+      {
+        access: 'account',
+        description:
+          'Access to perform any supported action on all linode instances in the account',
+        id: 'account_linode_admin',
+        name: 'account_linode_admin',
+        permissions: ['create_linode', 'update_linode', 'delete_linode'],
+        resource_ids: null,
+        resource_type: 'linode',
+      },
+      {
+        access: 'resource',
+        description: 'Access to update a linode instance',
+        id: 'linode_contributor',
+        name: 'linode_contributor',
+        permissions: ['update_linode', 'view_linode'],
+        resource_ids: [12345678],
+        resource_type: 'linode',
+      },
+    ];
+
+    const expectedRoles = [
+      {
+        access: 'account',
+        description:
+          'Access to perform any supported action on all resources in the account',
+        id: 'account_admin',
+        name: 'account_admin',
+        permissions: ['create_linode', 'update_linode', 'update_firewall'],
+        resource_ids: null,
+        resource_names: [],
+        resource_type: 'account',
+      },
+      {
+        access: 'account',
+        description:
+          'Access to perform any supported action on all linode instances in the account',
+        id: 'account_linode_admin',
+        name: 'account_linode_admin',
+        permissions: ['create_linode', 'update_linode', 'delete_linode'],
+        resource_ids: null,
+        resource_names: [],
+        resource_type: 'linode',
+      },
+      {
+        access: 'resource',
+        description: 'Access to update a linode instance',
+        id: 'linode_contributor',
+        name: 'linode_contributor',
+        permissions: ['update_linode', 'view_linode'],
+        resource_ids: [12345678],
+        resource_names: ['debian-us-123'],
+        resource_type: 'linode',
+      },
+    ];
+
+    expect(addResourceNamesToRoles(userRoles, accountResources)).toEqual(
+      expectedRoles
+    );
   });
 });

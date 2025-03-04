@@ -85,7 +85,7 @@ const transformedEntities = (entities: Resource[]): EntitiesOption[] => {
 
 const getEntitiesByType = (
   roleResourceType: ResourceType | ResourceTypePermissions,
-  resources: IamAccountResource
+  resources: IamAccountResource[]
 ): IamAccountResource | undefined => {
   const entitiesArray: IamAccountResource[] = Object.values(resources);
 

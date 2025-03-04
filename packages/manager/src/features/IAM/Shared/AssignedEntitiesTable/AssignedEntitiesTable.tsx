@@ -1,11 +1,12 @@
 import { Autocomplete, Typography } from '@linode/ui';
 import { capitalize } from '@linode/utilities';
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
+import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
 import { Table } from 'src/components/Table';
 import { TableBody } from 'src/components/TableBody';
 import { TableCell } from 'src/components/TableCell';
@@ -16,6 +17,7 @@ import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableRowLoading } from 'src/components/TableRowLoading/TableRowLoading';
 import { TableSortCell } from 'src/components/TableSortCell';
 import { useOrder } from 'src/hooks/useOrder';
+import { usePagination } from 'src/hooks/usePagination';
 import { useAccountUserPermissions } from 'src/queries/iam/iam';
 import { useAccountResources } from 'src/queries/resources/resources';
 
@@ -40,6 +42,8 @@ export const AssignedEntitiesTable = () => {
 
   const [entityType, setEntityType] = React.useState<EntitiesType | null>(null);
 
+  const pagination = usePagination(1);
+
   const {
     data: resources,
     error: resourcesError,
@@ -61,6 +65,8 @@ export const AssignedEntitiesTable = () => {
 
     return { entityTypes, roles };
   }, [assignedRoles, resources]);
+
+  // console.log('roles', roles)
 
   const actions: Action[] = [
     {
@@ -107,22 +113,27 @@ export const AssignedEntitiesTable = () => {
     if (assignedRoles && resources) {
       return (
         <>
-          {filteredRoles.map((el: EntitiesRole) => (
-            <TableRow key={el.id}>
-              <TableCell>
-                <Typography>{el.resource_name}</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography>{capitalize(el.resource_type)}</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography>{el.role_name}</Typography>
-              </TableCell>
-              <TableCell actionCell>
-                <ActionMenu actionsList={actions} ariaLabel="action menu" />
-              </TableCell>
-            </TableRow>
-          ))}
+          {filteredRoles
+            .slice(
+              (pagination.page - 1) * pagination.pageSize,
+              pagination.page * pagination.pageSize
+            )
+            .map((el: EntitiesRole) => (
+              <TableRow key={el.id}>
+                <TableCell>
+                  <Typography>{el.resource_name}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography>{capitalize(el.resource_type)}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography>{el.role_name}</Typography>
+                </TableCell>
+                <TableCell actionCell>
+                  <ActionMenu actionsList={actions} ariaLabel="action menu" />
+                </TableCell>
+              </TableRow>
+            ))}
         </>
       );
     }
@@ -197,6 +208,13 @@ export const AssignedEntitiesTable = () => {
         </TableHead>
         <TableBody>{renderTableBody()}</TableBody>
       </Table>
+      <PaginationFooter
+        count={roles.length || 0}
+        handlePageChange={pagination.handlePageChange}
+        handleSizeChange={pagination.handlePageSizeChange}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+      />
     </Grid>
   );
 };
@@ -206,7 +224,7 @@ const getEntityTypes = (data: EntitiesRole[]): EntitiesType[] =>
 
 const addResourceNamesToRoles = (
   assignedRoles: IamUserPermissions,
-  resources: IamAccountResource
+  resources: IamAccountResource[]
 ): EntitiesRole[] => {
   const resourcesRoles = assignedRoles.resource_access;
 

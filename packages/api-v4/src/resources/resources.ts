@@ -9,7 +9,7 @@ import { IamAccountResource } from './types';
  *
  */
 export const getAccountResources = () => {
-  return Request<IamAccountResource>(
+  return Request<IamAccountResource[]>(
     setURL(`${BETA_API_ROOT}/resources`),
     setMethod('GET')
   );

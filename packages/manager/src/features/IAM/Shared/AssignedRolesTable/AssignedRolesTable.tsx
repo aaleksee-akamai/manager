@@ -1,14 +1,17 @@
 import { Autocomplete, Chip, CircleProgress, Typography } from '@linode/ui';
-import { Grid, styled } from '@mui/material';
+import { styled } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { CollapsibleTable } from 'src/components/CollapsibleTable/CollapsibleTable';
 import { DebouncedSearchTextField } from 'src/components/DebouncedSearchTextField';
+import { PaginationFooter } from 'src/components/PaginationFooter/PaginationFooter';
 import { TableCell } from 'src/components/TableCell';
 import { TableRow } from 'src/components/TableRow';
 import { TableRowEmpty } from 'src/components/TableRowEmpty/TableRowEmpty';
+import { usePagination } from 'src/hooks/usePagination';
 import {
   useAccountPermissions,
   useAccountUserPermissions,
@@ -56,6 +59,8 @@ export const AssignedRolesTable = () => {
     isLoading: assignedRolesLoading,
   } = useAccountUserPermissions(username ?? '');
 
+  const pagination = usePagination(1);
+
   const { resourceTypes, roles } = React.useMemo(() => {
     if (!assignedRoles || !accountPermissions) {
       return { resourceTypes: [], roles: [] };
@@ -84,97 +89,102 @@ export const AssignedRolesTable = () => {
       roles,
     });
 
-    return filteredRoles.map((role: ExtendedRoleMap) => {
-      const resources = role.resource_names?.map((name: string) => (
-        <Chip key={name} label={name} />
-      ));
+    return filteredRoles
+      .slice(
+        (pagination.page - 1) * pagination.pageSize,
+        pagination.page * pagination.pageSize
+      )
+      .map((role: ExtendedRoleMap) => {
+        const resources = role.resource_names?.map((name: string) => (
+          <Chip key={name} label={name} />
+        ));
 
-      const accountMenu: Action[] = [
-        {
-          onClick: () => {
-            // mock
+        const accountMenu: Action[] = [
+          {
+            onClick: () => {
+              // mock
+            },
+            title: 'Change Role',
           },
-          title: 'Change Role',
-        },
-        {
-          onClick: () => {
-            // mock
+          {
+            onClick: () => {
+              // mock
+            },
+            title: 'Unassign Role',
           },
-          title: 'Unassign Role',
-        },
-      ];
+        ];
 
-      const entitiesMenu: Action[] = [
-        {
-          onClick: () => {
-            // mock
+        const entitiesMenu: Action[] = [
+          {
+            onClick: () => {
+              // mock
+            },
+            title: 'View Entities',
           },
-          title: 'View Entities',
-        },
-        {
-          onClick: () => {
-            // mock
+          {
+            onClick: () => {
+              // mock
+            },
+            title: 'Update List of Entities',
           },
-          title: 'Update List of Entities',
-        },
-        {
-          onClick: () => {
-            // mock
+          {
+            onClick: () => {
+              // mock
+            },
+            title: 'Change Role',
           },
-          title: 'Change Role',
-        },
-        {
-          onClick: () => {
-            // mock
+          {
+            onClick: () => {
+              // mock
+            },
+            title: 'Unassign Role',
           },
-          title: 'Unassign Role',
-        },
-      ];
+        ];
 
-      const actions = role.access === 'account' ? accountMenu : entitiesMenu;
+        const actions = role.access === 'account' ? accountMenu : entitiesMenu;
 
-      const OuterTableCells = (
-        <>
-          {role.access === 'account' ? (
+        const OuterTableCells = (
+          <>
+            {role.access === 'account' ? (
+              <TableCell>
+                <Typography>
+                  {role.resource_type === 'account'
+                    ? 'All entities'
+                    : `All ${role.resource_type}s`}
+                </Typography>
+              </TableCell>
+            ) : (
+              <TableCell>{resources}</TableCell>
+            )}
             <TableCell>
-              <Typography>
-                {role.resource_type === 'account'
-                  ? 'All entities'
-                  : `All ${role.resource_type}s`}
-              </Typography>
+              <ActionMenu actionsList={actions} ariaLabel="action menu" />
             </TableCell>
-          ) : (
-            <TableCell>{resources}</TableCell>
-          )}
-          <TableCell>
-            <ActionMenu actionsList={actions} ariaLabel="action menu" />
-          </TableCell>
-        </>
-      );
+          </>
+        );
 
-      const InnerTable = (
-        <Grid
-          sx={(theme) => ({
-            background: theme.color.grey5,
-            paddingBottom: 1.5,
-            paddingLeft: 4.5,
-            paddingRight: 4.5,
-            paddingTop: 1.5,
-          })}
-        >
-          <StyledTypography variant="body1">Description:</StyledTypography>
-          <Typography>{role.description}</Typography>
-        </Grid>
-      );
+        const InnerTable = (
+          <Grid
+            sx={(theme) => ({
+              background: theme.color.grey5,
+              paddingBottom: 1.5,
+              paddingLeft: 4.5,
+              paddingRight: 4.5,
+              paddingTop: 1.5,
+            })}
+          >
+            <StyledTypography variant="body1">Description:</StyledTypography>
+            <Typography>{role.description}</Typography>
+          </Grid>
+        );
 
-      return {
-        InnerTable,
-        OuterTableCells,
-        id: role.id,
-        label: role.name,
-      };
-    });
-  }, [roles, query, entityType]);
+        return {
+          InnerTable,
+          OuterTableCells,
+          id: role.id,
+          label: role.name,
+        };
+      });
+  }, [roles, query, entityType, pagination]);
 
   if (accountPermissionsLoading || resourcesLoading || assignedRolesLoading) {
     return <CircleProgress />;
@@ -218,6 +228,13 @@ export const AssignedRolesTable = () => {
         }
         TableItems={memoizedTableItems}
         TableRowHead={RoleTableRowHead}
+      />
+      <PaginationFooter
+        count={roles.length || 0}
+        handlePageChange={pagination.handlePageChange}
+        handleSizeChange={pagination.handlePageSizeChange}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
       />
     </Grid>
   );
@@ -322,9 +339,9 @@ const mapRolesToPermissions = (
   return Array.from(roleMap.values());
 };
 
-const addResourceNamesToRoles = (
+export const addResourceNamesToRoles = (
   roles: ExtendedRoleMap[],
-  resources: IamAccountResource
+  resources: IamAccountResource[]
 ): ExtendedRoleMap[] => {
   const resourcesArray: IamAccountResource[] = Object.values(resources);
 
