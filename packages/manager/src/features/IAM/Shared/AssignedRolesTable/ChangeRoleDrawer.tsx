@@ -18,7 +18,8 @@ import {
 } from 'src/queries/iam/iam';
 
 import { AssignedPermissionsPanel } from '../AssignedPermissionsPanel/AssignedPermissionsPanel';
-import { getAllRoles, getRoleByName, updateUserRoles } from '../utilities';
+import { getAllRoles, getRoleByName } from '../utilities';
+import { changeUserRole } from './utils';
 
 import type { DrawerModes, EntitiesOption, ExtendedRoleView } from '../types';
 import type { RolesType } from '../utilities';
@@ -100,12 +101,14 @@ export const ChangeRoleDrawer = ({ mode, onClose, open, role }: Props) => {
       const newRole = data.roleName.label;
       const access = data.roleName.access;
 
-      const updatedUserRoles = updateUserRoles({
+      if (!initialRole || !assignedRoles) return;
+
+      const updatedUserRoles = changeUserRole(
         access,
         assignedRoles,
         initialRole,
-        newRole,
-      });
+        newRole
+      );
 
       await updateUserPermissions(updatedUserRoles);
 
@@ -129,7 +132,7 @@ export const ChangeRoleDrawer = ({ mode, onClose, open, role }: Props) => {
         <Notice text={errors.root?.message} variant="error" />
       )}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Typography sx={{ marginBottom: 2.5 }}>
+        <Typography>
           Select a role you want{' '}
           {role?.access === 'account_access'
             ? 'to assign.'
@@ -137,7 +140,11 @@ export const ChangeRoleDrawer = ({ mode, onClose, open, role }: Props) => {
           <Link to=""> Learn more about roles and permissions.</Link>
         </Typography>
 
-        <Typography sx={{ marginBottom: theme.tokens.spacing.S12 }}>
+        <Typography
+          sx={{
+            margin: `${theme.tokens.spacing.S16} 0 ${theme.tokens.spacing.S8}`,
+          }}
+        >
           Change from role <strong>{role?.name}</strong> to:
         </Typography>
 

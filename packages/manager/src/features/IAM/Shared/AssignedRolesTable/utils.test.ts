@@ -3,6 +3,7 @@ import { userPermissionsFactory } from 'src/factories/userPermissions';
 
 import {
   addEntitiesNamesToRoles,
+  changeUserRole,
   combineRoles,
   mapRolesToPermissions,
 } from './utils';
@@ -133,6 +134,29 @@ describe('addResourceNamesToRoles', () => {
     ];
 
     expect(addEntitiesNamesToRoles(userRoles, mockGoupedEntities)).toEqual(
+      expectedRoles
+    );
+  });
+});
+
+describe('changeUserRole', () => {
+  it('should return an object of updated users roles with resource access', () => {
+    const initialRole = 'linode_contributor';
+    const newRole = 'linode_admin';
+    const access = entityAccess;
+    const assignedRoles = userPermissions;
+
+    const expectedRoles = {
+      account_access: ['account_linode_admin', 'linode_creator'],
+      entity_access: [
+        {
+          id: 12345678,
+          roles: ['linode_admin'],
+          type: 'linode',
+        },
+      ],
+    };
+    expect(changeUserRole(access, assignedRoles, initialRole, newRole)).toEqual(
       expectedRoles
     );
   });

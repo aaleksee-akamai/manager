@@ -89,7 +89,7 @@ const getDoesRolesMatchQuery = (
 export interface RolesType {
   access: IamAccessType;
   entity_type: EntityTypePermissions;
-  label: string;
+  label: AccountAccessRole | EntityAccessRole;
   value: string;
 }
 
@@ -183,52 +183,6 @@ export const mapAccountPermissionsToRoles = (
       )
     ),
   ].flat();
-};
-
-interface UpdateUserRolesProps {
-  access: 'account_access' | 'entity_access';
-  assignedRoles?: IamUserPermissions;
-  initialRole?: string;
-  newRole: string;
-}
-
-export const updateUserRoles = ({
-  access,
-  assignedRoles,
-  initialRole,
-  newRole,
-}: UpdateUserRolesProps): IamUserPermissions => {
-  if (access === 'account_access' && assignedRoles) {
-    return {
-      ...assignedRoles,
-      account_access: assignedRoles.account_access.map(
-        (role: AccountAccessRole) =>
-          role === initialRole ? (newRole as AccountAccessRole) : role
-      ),
-    };
-  }
-
-  if (access === 'entity_access' && assignedRoles) {
-    return {
-      ...assignedRoles,
-      entity_access: assignedRoles.entity_access.map(
-        (resource: EntityAccess) => ({
-          ...resource,
-          roles: resource.roles.map((role: EntityAccessRole) =>
-            role === initialRole ? (newRole as EntityAccessRole) : role
-          ),
-        })
-      ),
-    };
-  }
-
-  // If access type is invalid, return unchanged object
-  return (
-    assignedRoles ?? {
-      account_access: [],
-      entity_access: [],
-    }
-  );
 };
 
 export interface AssignNewRoleFormValues {

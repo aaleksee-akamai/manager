@@ -14,8 +14,11 @@ export type EntityTypePermissions =
 export type AccountAccessRole =
   | 'account_admin'
   | 'account_linode_admin'
+  | 'account_retail_owner'
   | 'account_viewer'
   | 'account_volume_admin'
+  | 'billing_admin'
+  | 'billing_viewer'
   | 'firewall_creator'
   | 'linode_contributor'
   | 'linode_creator'
@@ -25,7 +28,10 @@ export type EntityAccessRole =
   | 'database_admin'
   | 'firewall_admin'
   | 'firewall_creator'
+  | 'firewall_viewer'
+  | 'image_admin'
   | 'image_viewer'
+  | 'linode_admin'
   | 'linode_contributor'
   | 'linode_creator'
   | 'linode_viewer'
@@ -212,7 +218,7 @@ export interface IamAccess {
 
 export interface Roles {
   description: string;
-  name: string;
+  name: AccountAccessRole | EntityAccessRole;
   permissions: PermissionType[];
 }
 

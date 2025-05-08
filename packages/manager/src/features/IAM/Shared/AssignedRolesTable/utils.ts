@@ -4,6 +4,7 @@ import type { ExtendedRoleView, RoleView } from '../types';
 import type {
   AccountAccessRole,
   AccountEntity,
+  EntityAccess,
   EntityAccessRole,
   EntityType,
   IamAccountPermissions,
@@ -114,4 +115,47 @@ export const mapRolesToPermissions = (
       ...role,
       entity_ids: userRolesLookup.get(role.name) || null,
     }));
+};
+
+/**
+ * Changes a user's assigned role to a new role for either account or entity access.
+ * Updates the `account_access` or `entity_access` fields in the user's permissions accordingly.
+ *
+ * @param access - The type of access being updated ('account_access' or 'entity_access').
+ * @param assignedRoles - The user's current permissions.
+ * @param initialRole - The role to be changed.
+ * @param newRole - The new role to assign.
+ * @returns Updated user permissions with the changed role.
+ */
+export const changeUserRole = (
+  access: 'account_access' | 'entity_access',
+  assignedRoles: IamUserPermissions,
+  initialRole: AccountAccessRole | EntityAccessRole,
+  newRole: AccountAccessRole | EntityAccessRole
+): IamUserPermissions => {
+  if (access === 'account_access') {
+    return {
+      ...assignedRoles,
+      account_access: assignedRoles.account_access.map(
+        (role: AccountAccessRole) =>
+          role === initialRole ? (newRole as AccountAccessRole) : role
+      ),
+    };
+  }
+
+  if (access === 'entity_access') {
+    return {
+      ...assignedRoles,
+      entity_access: assignedRoles.entity_access.map(
+        (resource: EntityAccess) => ({
+          ...resource,
+          roles: resource.roles.map((role: EntityAccessRole) =>
+            role === initialRole ? (newRole as EntityAccessRole) : role
+          ),
+        })
+      ),
+    };
+  }
+
+  return assignedRoles;
 };

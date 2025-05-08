@@ -13,7 +13,6 @@ import {
   mergeAssignedRolesIntoExistingRoles,
   partition,
   toEntityAccess,
-  updateUserRoles,
 } from './utilities';
 
 import type { EntitiesRole, ExtendedRoleView, RoleView } from './types';
@@ -193,32 +192,6 @@ describe('getRoleByName', () => {
     };
 
     expect(getRoleByName(accountPermissions, roleName)).toEqual(expectedRole);
-  });
-});
-
-describe('updateUserRoles', () => {
-  it('should return an object of updated users roles with resource access', () => {
-    const expectedRoles = {
-      account_access: ['account_linode_admin', 'linode_creator'],
-      entity_access: [
-        {
-          id: 12345678,
-          roles: ['linode_admin'],
-          type: 'linode',
-        },
-      ],
-    };
-
-    const initialRole = 'linode_contributor';
-    const newRole = 'linode_admin';
-    expect(
-      updateUserRoles({
-        access: entityAccess,
-        assignedRoles: userPermissions,
-        initialRole,
-        newRole,
-      })
-    ).toEqual(expectedRoles);
   });
 });
 
