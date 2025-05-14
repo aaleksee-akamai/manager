@@ -1,6 +1,7 @@
-import { ActionsPanel, Drawer, Typography } from '@linode/ui';
+import { ActionsPanel, Drawer, Notice, Typography } from '@linode/ui';
 import { useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import { enqueueSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
@@ -46,7 +47,7 @@ export const AssignNewRoleDrawer = ({ onClose, open }: Props) => {
     },
   });
 
-  const { control, handleSubmit, reset, watch } = form;
+  const { control, handleSubmit, reset, watch, formState, setError } = form;
   const { append, fields, remove } = useFieldArray({
     control,
     name: 'roles',
@@ -56,7 +57,6 @@ export const AssignNewRoleDrawer = ({ onClose, open }: Props) => {
 
   // to watch changes to this value since we're conditionally rendering "Add another role"
   const roles = watch('roles');
-
   const allRoles = React.useMemo(() => {
     if (!accountPermissions) {
       return [];
@@ -64,16 +64,23 @@ export const AssignNewRoleDrawer = ({ onClose, open }: Props) => {
     return getAllRoles(accountPermissions);
   }, [accountPermissions]);
 
-  const { mutateAsync: updateUserRolePermissions } =
+  const { mutateAsync: updateUserRolePermissions, isPending } =
     useAccountUserPermissionsMutation(username);
 
   const onSubmit = handleSubmit(async (values: AssignNewRoleFormValues) => {
-    const mergedRoles = mergeAssignedRolesIntoExistingRoles(
-      values,
-      existingRoles
-    );
-    await updateUserRolePermissions(mergedRoles);
-    handleClose();
+    try {
+      const mergedRoles = mergeAssignedRolesIntoExistingRoles(
+        values,
+        existingRoles
+      );
+      await updateUserRolePermissions(mergedRoles);
+      enqueueSnackbar(`Roles added.`, {
+        variant: 'success',
+      });
+      handleClose();
+    } catch (error) {
+      setError(error.field ?? 'root', { message: error[0].reason });
+    }
   });
 
   const handleClose = () => {
@@ -87,7 +94,17 @@ export const AssignNewRoleDrawer = ({ onClose, open }: Props) => {
       {' '}
       <FormProvider {...form}>
         <form onSubmit={onSubmit}>
-          <Typography sx={{ marginBottom: 3 }}>
+          {formState.errors.root?.message && (
+            <Notice variant="error">
+              <Typography>
+                Internal Error - Issue with updating permissions.
+                <br />
+                No changes were saved.
+              </Typography>
+            </Notice>
+          )}
+
+          <Typography sx={{ marginBottom: 2.5 }}>
             Select a role you want to assign to a user. Some roles require
             selecting entities they should apply to. Configure the first role
             and continue adding roles or save the assignment.
@@ -138,6 +155,7 @@ export const AssignNewRoleDrawer = ({ onClose, open }: Props) => {
             primaryButtonProps={{
               'data-testid': 'submit',
               label: 'Assign',
+              loading: formState.isSubmitting || isPending,
               type: 'submit',
             }}
             secondaryButtonProps={{
