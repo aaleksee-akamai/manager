@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 import { useAccountUser } from '@linode/queries';
 import { CircleProgress, ErrorState, NotFound, Stack } from '@linode/ui';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { DocumentTitleSegment } from 'src/components/DocumentTitle';
-import { useUserRoles } from 'src/queries/iam/iam';
+import { useUserAccountPermissions, useUserEntityPermissions, useUserRoles } from 'src/queries/iam/iam';
 
 import { DeleteUserPanel } from './DeleteUserPanel';
 import { UserDetailsPanel } from './UserDetailsPanel';
@@ -16,6 +17,22 @@ export const UserProfile = () => {
 
   const { data: user, error, isLoading } = useAccountUser(username ?? '');
   const { data: assignedRoles } = useUserRoles(username ?? '');
+
+  const { data: perm } = useUserAccountPermissions(username ?? '');
+  if (perm?.includes('list_events')) {
+    console.log('list_events', 'lslld');
+  }
+
+  console.log('perm', perm);
+
+
+    const { data: entPerm } = useUserEntityPermissions(
+    'linode',
+    12345,
+    username ?? ''
+  );
+
+  console.log('entPerm', entPerm);
 
   if (isLoading) {
     return <CircleProgress />;
