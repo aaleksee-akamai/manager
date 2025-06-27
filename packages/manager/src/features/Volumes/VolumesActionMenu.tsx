@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { useState } from 'react';
 
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
 import { getRestrictedResourceText } from 'src/features/Account/utils';
 import { useIsResourceRestricted } from 'src/hooks/useIsResourceRestricted';
+
+import { usePermissions } from '../IAM/hooks/usePermissions';
 
 import type { Volume } from '@linode/api-v4';
 import type { Action } from 'src/components/ActionMenu/ActionMenu';
@@ -28,6 +31,8 @@ export interface Props {
 export const VolumesActionMenu = (props: Props) => {
   const { handlers, isVolumesLanding, volume } = props;
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const attached = volume.linode_id !== null;
 
   const isVolumeReadOnly = useIsResourceRestricted({
@@ -36,13 +41,28 @@ export const VolumesActionMenu = (props: Props) => {
     id: volume.id,
   });
 
+  const { permissions } = usePermissions(
+    'volume',
+    [
+      'update_volume',
+      'resize_volume',
+      'clone_volume',
+      'detach_volume',
+      'delete_volume',
+      'attach_volume',
+    ],
+    volume.id,
+    isOpen
+  );
+
   const actions: Action[] = [
     {
       onClick: handlers.handleDetails,
       title: 'Show Config',
     },
     {
-      disabled: isVolumeReadOnly,
+      // disabled: isVolumeReadOnly,
+      disabled: !permissions.update_volume,
       onClick: handlers.handleEdit,
       title: 'Edit',
       tooltip: isVolumeReadOnly
@@ -54,12 +74,14 @@ export const VolumesActionMenu = (props: Props) => {
         : undefined,
     },
     {
-      disabled: isVolumeReadOnly,
+      // disabled: isVolumeReadOnly,
+      disabled: !permissions.update_volume,
       onClick: handlers.handleManageTags,
       title: 'Manage Tags',
     },
     {
-      disabled: isVolumeReadOnly,
+      // disabled: isVolumeReadOnly,
+      disabled: !permissions.resize_volume,
       onClick: handlers.handleResize,
       title: 'Resize',
       tooltip: isVolumeReadOnly
@@ -71,7 +93,8 @@ export const VolumesActionMenu = (props: Props) => {
         : undefined,
     },
     {
-      disabled: isVolumeReadOnly,
+      // disabled: isVolumeReadOnly,
+      disabled: !permissions.clone_volume,
       onClick: handlers.handleClone,
       title: 'Clone',
       tooltip: isVolumeReadOnly
@@ -86,7 +109,8 @@ export const VolumesActionMenu = (props: Props) => {
 
   if (!attached && isVolumesLanding) {
     actions.push({
-      disabled: isVolumeReadOnly,
+      // disabled: isVolumeReadOnly,
+      disabled: !permissions.attach_volume,
       onClick: handlers.handleAttach,
       title: 'Attach',
       tooltip: isVolumeReadOnly
@@ -99,7 +123,8 @@ export const VolumesActionMenu = (props: Props) => {
     });
   } else {
     actions.push({
-      disabled: isVolumeReadOnly,
+      // disabled: isVolumeReadOnly,
+      disabled: !permissions.detach_volume,
       onClick: handlers.handleDetach,
       title: 'Detach',
       tooltip: isVolumeReadOnly
@@ -113,7 +138,8 @@ export const VolumesActionMenu = (props: Props) => {
   }
 
   actions.push({
-    disabled: isVolumeReadOnly || attached,
+    // disabled: isVolumeReadOnly || attached,
+    disabled: !permissions.delete_volume || attached,
     onClick: handlers.handleDelete,
     title: 'Delete',
     tooltip: isVolumeReadOnly
@@ -127,10 +153,15 @@ export const VolumesActionMenu = (props: Props) => {
         : undefined,
   });
 
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
   return (
     <ActionMenu
       actionsList={actions}
       ariaLabel={`Action menu for Volume ${volume.label}`}
+      onOpen={handleOpen}
     />
   );
 };

@@ -113,6 +113,14 @@ export type AccountAdmin =
   | 'view_service_transfer'
   | 'view_user'
   | 'view_user_preferences'
+  | 'update_volume'
+  | 'create_volume'
+  | 'create_image'
+  | 'resize_volume'
+  | 'clone_volume'
+  | 'detach_volume'
+  | 'delete_volume'
+  | 'attach_volume'
   | AccountBillingAdmin
   | AccountEventViewer
   | AccountFirewallAdmin

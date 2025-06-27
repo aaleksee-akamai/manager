@@ -21,7 +21,8 @@ import { Encryption } from 'src/components/Encryption/Encryption';
 import { useIsBlockStorageEncryptionFeatureEnabled } from 'src/components/Encryption/utils';
 import { TagsInput } from 'src/components/TagsInput/TagsInput';
 import { MAX_VOLUME_SIZE } from 'src/constants';
-import { useRestrictedGlobalGrantCheck } from 'src/hooks/useRestrictedGlobalGrantCheck';
+import { usePermissions } from 'src/features/IAM/hooks/usePermissions';
+// import { useRestrictedGlobalGrantCheck } from 'src/hooks/useRestrictedGlobalGrantCheck';
 import { useEventsPollingActions } from 'src/queries/events/events';
 import { sendCreateVolumeEvent } from 'src/utilities/analytics/customEventAnalytics';
 import { getErrorStringOrDefault } from 'src/utilities/errorUtils';
@@ -86,9 +87,13 @@ export const LinodeVolumeCreateForm = (props: Props) => {
 
   const { checkForNewEvents } = useEventsPollingActions();
 
-  const isVolumesGrantReadOnly = useRestrictedGlobalGrantCheck({
-    globalGrantType: 'add_volumes',
-  });
+  // const isVolumesGrantReadOnly = useRestrictedGlobalGrantCheck({
+  //   globalGrantType: 'add_volumes',
+  // });
+
+  const { permissions: accountPermissions } = usePermissions('account', [
+    'create_volume',
+  ]);
 
   const { isBlockStorageEncryptionFeatureEnabled } =
     useIsBlockStorageEncryptionFeatureEnabled();
@@ -175,7 +180,8 @@ export const LinodeVolumeCreateForm = (props: Props) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      {isVolumesGrantReadOnly && (
+      {/* {isVolumesGrantReadOnly && ( */}
+      {!accountPermissions.create_volume && (
         <Notice
           text={
             "You don't have permissions to create a new Volume. Please contact an account administrator for details."
@@ -208,7 +214,8 @@ export const LinodeVolumeCreateForm = (props: Props) => {
       </Typography>
       <TextField
         data-qa-volume-label
-        disabled={isVolumesGrantReadOnly}
+        // disabled={isVolumesGrantReadOnly}
+        disabled={!accountPermissions.create_volume}
         errorText={touched.label ? errors.label : undefined}
         label="Label"
         name="label"
@@ -218,7 +225,8 @@ export const LinodeVolumeCreateForm = (props: Props) => {
         value={values.label}
       />
       <SizeField
-        disabled={isVolumesGrantReadOnly}
+        // disabled={isVolumesGrantReadOnly}
+        disabled={!accountPermissions.create_volume}
         error={touched.size ? errors.size : undefined}
         isFromLinode
         name="size"
@@ -228,7 +236,8 @@ export const LinodeVolumeCreateForm = (props: Props) => {
         value={values.size}
       />
       <ConfigSelect
-        disabled={isVolumesGrantReadOnly}
+        // disabled={isVolumesGrantReadOnly}
+        disabled={!accountPermissions.create_volume}
         error={touched.config_id ? errors.config_id : undefined}
         key={linode.id}
         linodeId={linode.id}
@@ -238,7 +247,8 @@ export const LinodeVolumeCreateForm = (props: Props) => {
         value={values.config_id}
       />
       <TagsInput
-        disabled={isVolumesGrantReadOnly}
+        // disabled={isVolumesGrantReadOnly}
+        disabled={!accountPermissions.create_volume}
         label="Tags"
         name="tags"
         onChange={(items) =>
@@ -288,8 +298,14 @@ export const LinodeVolumeCreateForm = (props: Props) => {
       />
       <ActionsPanel
         primaryButtonProps={{
+          // disabled:
+          //   isVolumesGrantReadOnly ||
+          //   isInvalidPrice ||
+          //   (!linodeSupportsBlockStorageEncryption &&
+          //     values.encryption === 'enabled'),
+
           disabled:
-            isVolumesGrantReadOnly ||
+            !accountPermissions.create_volume ||
             isInvalidPrice ||
             (!linodeSupportsBlockStorageEncryption &&
               values.encryption === 'enabled'),

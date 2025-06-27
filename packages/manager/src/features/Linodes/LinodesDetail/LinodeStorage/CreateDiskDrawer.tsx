@@ -72,7 +72,7 @@ export const CreateDiskDrawer = (props: Props) => {
   });
 
   const { mutateAsync: createDisk, reset } =
-    useLinodeDiskCreateMutation(linodeId);
+    useLinodeDiskCreateMutation(linodeId); // - create_linode_disk
 
   const maximumSize = calculateDiskFree(linode, disks, 0);
 

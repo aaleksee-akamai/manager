@@ -1,15 +1,11 @@
-import { splitAt } from '@linode/utilities';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import * as React from 'react';
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { ActionMenu } from 'src/components/ActionMenu/ActionMenu';
-import { InlineMenuAction } from 'src/components/InlineMenuAction/InlineMenuAction';
-import { sendEvent } from 'src/utilities/analytics/utils';
+import { usePermissions } from 'src/features/IAM/hooks/usePermissions';
 
 import type { Disk, Linode } from '@linode/api-v4';
-import type { Theme } from '@mui/material/styles';
 import type { Action } from 'src/components/ActionMenu/ActionMenu';
 
 interface Props {
@@ -19,12 +15,10 @@ interface Props {
   onDelete: () => void;
   onRename: () => void;
   onResize: () => void;
-  readOnly?: boolean;
+  // readOnly?: boolean;
 }
 
 export const LinodeDiskActionMenu = (props: Props) => {
-  const theme = useTheme<Theme>();
-  const matchesSmDown = useMediaQuery(theme.breakpoints.down('md'));
   const history = useHistory();
 
   const {
@@ -34,8 +28,10 @@ export const LinodeDiskActionMenu = (props: Props) => {
     onDelete,
     onRename,
     onResize,
-    readOnly,
+    // readOnly,
   } = props;
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const poweredOnTooltip =
     linodeStatus !== 'offline'
@@ -47,73 +43,74 @@ export const LinodeDiskActionMenu = (props: Props) => {
       ? 'You cannot create images from Swap images.'
       : undefined;
 
+  const { permissions: accountPermissions } = usePermissions('account', [
+    'create_image',
+  ]);
+
+  const { permissions } = usePermissions(
+    'linode',
+    [
+      'update_linode_disk',
+      'resize_linode_disk',
+      'delete_linode_disk',
+      'clone_linode',
+    ],
+    linodeId,
+    isOpen
+  );
+
   const actions: Action[] = [
     {
-      disabled: readOnly,
+      // disabled: readOnly,
+      disabled: !permissions.update_linode_disk,
       onClick: onRename,
       title: 'Rename',
     },
     {
-      disabled: linodeStatus !== 'offline' || readOnly,
+      // disabled: linodeStatus !== 'offline' || readOnly,
+      disabled: !permissions.resize_linode_disk || linodeStatus !== 'offline',
       onClick: onResize,
       title: 'Resize',
       tooltip: poweredOnTooltip,
     },
     {
-      disabled: readOnly || !!swapTooltip,
+      // disabled: readOnly || !!swapTooltip,
+      disabled: !accountPermissions.create_image || !!swapTooltip,
       onClick: () =>
         history.push(
           `/images/create/disk?selectedLinode=${linodeId}&selectedDisk=${disk.id}`
         ),
-      title: 'Create Disk Image',
+      title: 'Create Disk Image', // - create_image account access
       tooltip: swapTooltip,
     },
     {
-      disabled: readOnly,
+      // disabled: readOnly,
+      disabled: !permissions.clone_linode,
       onClick: () => {
         history.push(
           `/linodes/${linodeId}/clone/disks?selectedDisk=${disk.id}`
         );
       },
-      title: 'Clone',
+      title: 'Clone', // - clone_linode
     },
     {
-      disabled: linodeStatus !== 'offline' || readOnly,
+      // disabled: linodeStatus !== 'offline' || readOnly,
+      disabled: !permissions.delete_linode_disk || linodeStatus !== 'offline',
       onClick: onDelete,
       title: 'Delete',
       tooltip: poweredOnTooltip,
     },
   ];
 
-  const splitActionsArrayIndex = matchesSmDown ? 0 : 2;
-  const [inlineActions, menuActions] = splitAt(splitActionsArrayIndex, actions);
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
 
   return (
-    <>
-      {!matchesSmDown &&
-        inlineActions.map((action) => (
-          <InlineMenuAction
-            actionText={action.title}
-            disabled={action.disabled}
-            key={action.title}
-            onClick={action.onClick}
-            tooltip={action.tooltip}
-            tooltipAnalyticsEvent={
-              action.title === 'Resize'
-                ? () =>
-                    sendEvent({
-                      action: `Open:tooltip`,
-                      category: `Disk ${action.title} Flow`,
-                      label: `${action.title} help icon tooltip`,
-                    })
-                : undefined
-            }
-          />
-        ))}
-      <ActionMenu
-        actionsList={menuActions}
-        ariaLabel={`Action menu for Disk ${disk.label}`}
-      />
-    </>
+    <ActionMenu
+      actionsList={actions}
+      ariaLabel={`Action menu for Disk ${disk.label}`}
+      onOpen={handleOpen}
+    />
   );
 };

@@ -9,6 +9,7 @@ import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { number, object } from 'yup';
 
+import { usePermissions } from 'src/features/IAM/hooks/usePermissions';
 import { useEventsPollingActions } from 'src/queries/events/events';
 import {
   handleFieldErrors,
@@ -97,6 +98,12 @@ export const LinodeVolumeAttachForm = (props: Props) => {
     validationSchema: AttachVolumeValidationSchema,
   });
 
+  const { permissions } = usePermissions(
+    'volume',
+    ['attach_volume'],
+    values.volume_id
+  );
+
   const { data: volume } = useVolumeQuery(
     values.volume_id,
     values.volume_id !== -1
@@ -142,7 +149,10 @@ export const LinodeVolumeAttachForm = (props: Props) => {
       />
       <ActionsPanel
         primaryButtonProps={{
-          disabled: isReadOnly || linodeRequiresClientLibraryUpdate,
+          // disabled: isReadOnly || linodeRequiresClientLibraryUpdate,
+          disabled:
+            !permissions.attach_volume || linodeRequiresClientLibraryUpdate,
+
           label: 'Attach Volume',
           loading: isSubmitting,
           type: 'submit',

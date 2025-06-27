@@ -1,6 +1,6 @@
 import {
   useAllLinodeDisksQuery,
-  useGrants,
+  // useGrants,
   useLinodeQuery,
 } from '@linode/queries';
 import { Box, Button, Paper, Stack, Typography } from '@linode/ui';
@@ -22,6 +22,7 @@ import { TableRowEmpty } from 'src/components/TableRowEmpty/TableRowEmpty';
 import { TableRowError } from 'src/components/TableRowError/TableRowError';
 import { TableRowLoading } from 'src/components/TableRowLoading/TableRowLoading';
 import { TableSortCell } from 'src/components/TableSortCell';
+import { usePermissions } from 'src/features/IAM/hooks/usePermissions';
 import { sendEvent } from 'src/utilities/analytics/utils';
 
 import { addUsedDiskSpace } from '../utilities';
@@ -40,7 +41,9 @@ export const LinodeDisks = () => {
 
   const { data: disks, error, isLoading } = useAllLinodeDisksQuery(id);
   const { data: linode } = useLinodeQuery(id);
-  const { data: grants } = useGrants();
+  // const { data: grants } = useGrants();
+
+  const { permissions } = usePermissions('linode', ['create_linode_disk'], id);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = React.useState(false);
@@ -52,13 +55,15 @@ export const LinodeDisks = () => {
 
   const linodeTotalDisk = linode?.specs.disk ?? 0;
 
-  const readOnly =
-    grants !== undefined &&
-    grants.linode.some((g) => g.id === id && g.permissions === 'read_only');
+  // const readOnly =
+  //   grants !== undefined &&
+  //   grants.linode.some((g) => g.id === id && g.permissions === 'read_only');
 
   const usedDiskSpace = addUsedDiskSpace(disks ?? []);
 
   const hasFreeDiskSpace = linodeTotalDisk > usedDiskSpace;
+    // const hasFreeDiskSpace = false;
+
 
   const noFreeDiskSpaceWarning =
     'You do not have enough unallocated storage to create a Disk. Please choose a different plan with more storage or delete an existing Disk.';
@@ -97,10 +102,10 @@ export const LinodeDisks = () => {
         key={disk.id}
         linodeId={id}
         linodeStatus={linode?.status ?? 'offline'}
-        onDelete={() => onDelete(disk)}
-        onRename={() => onRename(disk)}
-        onResize={() => onResize(disk)}
-        readOnly={readOnly}
+        onDelete={() => onDelete(disk)} // - delete_linode_disk
+        onRename={() => onRename(disk)} // - update_linode_disk
+        onResize={() => onResize(disk)} // - resize_linode_disk
+        // readOnly={readOnly}
       />
     ));
   };
@@ -125,9 +130,10 @@ export const LinodeDisks = () => {
             href="https://techdocs.akamai.com/cloud-computing/docs/manage-disks-on-a-compute-instance#create-a-disk"
             label="Creating Disks"
           />
-          <Button
+          <Button // - create_linode_disk
             buttonType="primary"
-            disabled={readOnly || !hasFreeDiskSpace}
+            // disabled={readOnly || !hasFreeDiskSpace}
+            disabled={!permissions.create_linode_disk || !hasFreeDiskSpace}
             onClick={() => setIsCreateDrawerOpen(true)}
             tooltipAnalyticsEvent={() =>
               sendEvent({
@@ -218,24 +224,24 @@ export const LinodeDisks = () => {
           </Paginate>
         )}
       </OrderBy>
-      <DeleteDiskDialog
+      <DeleteDiskDialog // - delete_linode_disk
         disk={selectedDisk}
         linodeId={id}
         onClose={() => setIsDeleteDialogOpen(false)}
         open={isDeleteDialogOpen}
       />
-      <CreateDiskDrawer
+      <CreateDiskDrawer // - create_linode_disk
         linodeId={id}
         onClose={() => setIsCreateDrawerOpen(false)}
         open={isCreateDrawerOpen}
       />
-      <RenameDiskDrawer
+      <RenameDiskDrawer // - update_linode_disk
         disk={selectedDisk}
         linodeId={id}
         onClose={() => setIsRenameDrawerOpen(false)}
         open={isRenameDrawerOpen}
       />
-      <ResizeDiskDrawer
+      <ResizeDiskDrawer // - resize_linode_disk
         disk={selectedDisk}
         linodeId={id}
         onClose={() => setIsResizeDrawerOpen(false)}

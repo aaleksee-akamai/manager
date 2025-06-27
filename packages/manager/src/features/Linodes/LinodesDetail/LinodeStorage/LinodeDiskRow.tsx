@@ -19,7 +19,7 @@ interface Props {
   onDelete: () => void;
   onRename: () => void;
   onResize: () => void;
-  readOnly: boolean;
+  // readOnly: boolean;
 }
 
 export const LinodeDiskRow = React.memo((props: Props) => {
@@ -32,7 +32,7 @@ export const LinodeDiskRow = React.memo((props: Props) => {
     onDelete,
     onRename,
     onResize,
-    readOnly,
+    // readOnly,
   } = props;
 
   const diskEventLabelMap: Partial<Record<EventAction, string>> = {
@@ -91,7 +91,7 @@ export const LinodeDiskRow = React.memo((props: Props) => {
           onDelete={onDelete}
           onRename={onRename}
           onResize={onResize}
-          readOnly={readOnly}
+          // readOnly={readOnly}
         />
       </TableCell>
     </TableRow>

@@ -28,11 +28,12 @@ import { ResizeVolumeDrawer } from 'src/features/Volumes/Drawers/ResizeVolumeDra
 import { VolumeDetailsDrawer } from 'src/features/Volumes/Drawers/VolumeDetailsDrawer';
 import { LinodeVolumeAddDrawer } from 'src/features/Volumes/Drawers/VolumeDrawer/LinodeVolumeAddDrawer';
 import { VolumeTableRow } from 'src/features/Volumes/VolumeTableRow';
-import { useIsResourceRestricted } from 'src/hooks/useIsResourceRestricted';
+// import { useIsResourceRestricted } from 'src/hooks/useIsResourceRestricted';
 import { useOrder } from 'src/hooks/useOrder';
 import { usePagination } from 'src/hooks/usePagination';
 
 import type { Volume } from '@linode/api-v4';
+// import { usePermissions } from 'src/features/IAM/hooks/usePermissions';
 
 export const preferenceKey = 'linode-volumes';
 
@@ -42,12 +43,16 @@ export const LinodeVolumes = () => {
 
   const { data: linode } = useLinodeQuery(id);
 
-  const isLinodesGrantReadOnly = useIsResourceRestricted({
-    grantLevel: 'read_only',
-    grantType: 'linode',
-    id,
-  });
+  // const isLinodesGrantReadOnly = useIsResourceRestricted({
+  //   grantLevel: 'read_only',
+  //   grantType: 'linode',
+  //   id,
+  // });
 
+  // const { permissions: accountPermissions } = usePermissions('account', [
+  //   'create_volume',
+  // ]);
+  
   const { handleOrderChange, order, orderBy } = useOrder(
     {
       order: 'desc',
@@ -160,13 +165,13 @@ export const LinodeVolumes = () => {
           <VolumeTableRow
             handlers={{
               handleAttach: () => null,
-              handleClone: () => handleClone(volume),
-              handleDelete: () => handleDelete(volume),
-              handleDetach: () => handleDetach(volume),
-              handleDetails: () => handleDetails(volume),
-              handleEdit: () => handleEdit(volume),
-              handleManageTags: () => handleManageTags(volume),
-              handleResize: () => handleResize(volume),
+              handleClone: () => handleClone(volume), // - clone_volume
+              handleDelete: () => handleDelete(volume), // - delete_volume
+              handleDetach: () => handleDetach(volume), // - detach_volume
+              handleDetails: () => handleDetails(volume), // - N/A
+              handleEdit: () => handleEdit(volume), // - update_volume
+              handleManageTags: () => handleManageTags(volume), // - update_volume
+              handleResize: () => handleResize(volume), // - resize_volume
               handleUpgrade: () => null,
             }}
             isBlockStorageEncryptionFeatureEnabled={
@@ -199,7 +204,8 @@ export const LinodeVolumes = () => {
         <Typography variant="h3">Volumes</Typography>
         <Button
           buttonType="primary"
-          disabled={isLinodesGrantReadOnly}
+          // disabled={isLinodesGrantReadOnly}
+          // disabled={!accountPermissions.create_volume} // create_volume or/and attach_volume - user can attach volumes and doesn't have a create_volume permission
           onClick={handleCreateVolume}
         >
           Add Volume
@@ -252,7 +258,7 @@ export const LinodeVolumes = () => {
         pageSize={pagination.pageSize}
       />
       {linode && (
-        <LinodeVolumeAddDrawer
+        <LinodeVolumeAddDrawer // create_volume or/and attach_volume
           linode={linode}
           onClose={() => setIsCreateDrawerOpen(false)}
           open={isCreateDrawerOpen}
