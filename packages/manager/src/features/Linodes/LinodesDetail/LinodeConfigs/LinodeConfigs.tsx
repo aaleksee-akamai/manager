@@ -129,7 +129,7 @@ const LinodeConfigs = () => {
           href={
             'https://techdocs.akamai.com/cloud-computing/docs/manage-configuration-profiles-on-a-compute-instance'
           }
-          label={'Configuration Profiles'}
+          label={'Configuration Profiles22'}
           onClick={() => {
             sendLinodeConfigurationDocsEvent('Configuration Profiles');
           }}

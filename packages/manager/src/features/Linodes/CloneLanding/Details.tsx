@@ -240,12 +240,12 @@ export const Details = (props: Props) => {
       <ActionsPanel
         primaryButtonProps={{
           disabled: isCloneButtonDisabled,
-          label: 'Clone',
+          label: 'Clone11111',
           loading: isSubmitting,
           onClick: handleClone,
         }}
         secondaryButtonProps={{
-          label: 'Cancel',
+          label: 'Cancel55555',
           onClick: handleCancel,
         }}
       />

@@ -76,7 +76,7 @@ export const CloneLanding = () => {
     // These must correspond to the routes inside the Switch
     {
       routeName: `${match.url}/configs`,
-      title: 'Configuration Profiles',
+      title: 'Configuration Profiles11',
     },
     {
       routeName: `${match.url}/disks`,
@@ -291,7 +291,7 @@ export const CloneLanding = () => {
                 sx={{ marginBottom: theme.spacing(2) }}
                 variant="h2"
               >
-                Clone
+                Clone111
               </Typography>
 
               <Tabs
